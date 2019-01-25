@@ -80,30 +80,33 @@ class SyncWorker : SimpleJobService() {
         val end = LocalDate.now().friday
 
         if (start.isHolidays) return RESULT_FAIL_NORETRY
+        if (!student.isStudentSaved) return RESULT_FAIL_RETRY
 
         var error: Throwable? = null
 
+        val notify = prefRepository.isNotificationsEnable
+
         disposable.add(student.getCurrentStudent()
-            .flatMap { semester.getCurrentSemester(it, true) }
+            .flatMap { semester.getCurrentSemester(it, true).map { semester -> semester to it } }
             .flatMapPublisher {
                 Single.merge(
                     listOf(
-                        gradesDetails.getGrades(it, true, true),
-                        gradesSummary.getGradesSummary(it, true),
-                        attendance.getAttendance(it, start, end, true),
-                        exam.getExams(it, start, end, true),
-                        timetable.getTimetable(it, start, end, true),
-                        message.getMessages(it.studentId, RECEIVED, true, true),
-                        note.getNotes(it, true, true),
-                        homework.getHomework(it, LocalDate.now(), true),
-                        homework.getHomework(it, LocalDate.now().plusDays(1), true)
+                        gradesDetails.getGrades(it.first, true, notify),
+                        gradesSummary.getGradesSummary(it.first, true),
+                        attendance.getAttendance(it.first, start, end, true),
+                        exam.getExams(it.first, start, end, true),
+                        timetable.getTimetable(it.first, start, end, true),
+                        message.getMessages(it.second, RECEIVED, true, notify),
+                        note.getNotes(it.first, true, notify),
+                        homework.getHomework(it.first, LocalDate.now(), true),
+                        homework.getHomework(it.first, LocalDate.now().plusDays(1), true)
                     )
                 )
             }
             .subscribe({}, { error = it }))
 
         return if (null === error) {
-            if (prefRepository.isNotificationsEnable) sendNotifications()
+            if (notify) sendNotifications()
             Timber.d("Synchronization successful")
             RESULT_SUCCESS
         } else {
@@ -138,7 +141,7 @@ class SyncWorker : SimpleJobService() {
         disposable.add(student.getCurrentStudent()
             .flatMap { message.getNewMessages(it) }
             .map { it.filter { message -> !message.isNotified } }
-            .doOnSuccess{
+            .doOnSuccess {
                 if (it.isNotEmpty()) {
                     Timber.d("Found ${it.size} unread messages")
                     MessageNotification(applicationContext).sendNotification(it)
