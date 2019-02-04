@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import eu.davidea.flexibleadapter.items.IFlexible
@@ -15,7 +16,7 @@ import io.github.wulkanowy.utils.toFormattedString
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_timetable.*
 
-class TimetableItem(val lesson: Timetable, private val roomText: String)
+class TimetableItem(val lesson: Timetable, private val roomText: String, val gap: Boolean = false)
     : AbstractFlexibleItem<TimetableItem.ViewHolder>() {
 
     override fun getLayoutRes(): Int = R.layout.item_timetable
@@ -28,6 +29,9 @@ class TimetableItem(val lesson: Timetable, private val roomText: String)
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder,
                                 position: Int, payloads: MutableList<Any>?) {
         holder.apply {
+            var layoutParams = itemView.layoutParams as RecyclerView.LayoutParams
+            layoutParams.topMargin = if (gap) 48 else 0
+
             timetableItemNumber.text = lesson.number.toString()
             timetableItemSubject.text = lesson.subject
             timetableItemRoom.text = if (lesson.room.isNotBlank()) "$roomText ${lesson.room}" else ""

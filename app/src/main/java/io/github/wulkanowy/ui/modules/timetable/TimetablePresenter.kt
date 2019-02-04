@@ -78,11 +78,16 @@ class TimetablePresenter @Inject constructor(
         currentDate = date
         disposable.apply {
             clear()
+            var previousLessonNumber: Int? = null
             add(studentRepository.getCurrentStudent()
                 .flatMap { semesterRepository.getCurrentSemester(it) }
                 .delay(200, MILLISECONDS)
                 .flatMap { timetableRepository.getTimetable(it, currentDate, currentDate, forceRefresh) }
-                .map { items -> items.map { TimetableItem(it, view?.roomString.orEmpty()) } }
+                .map { items -> items.map {
+                    var gap: Boolean = previousLessonNumber !== null && it.number - previousLessonNumber!! > 1
+                    previousLessonNumber = it.number
+                    return@map TimetableItem(it, view?.roomString.orEmpty(), gap)
+                } }
                 .map { items -> items.sortedBy { it.lesson.number } }
                 .subscribeOn(schedulers.backgroundThread)
                 .observeOn(schedulers.mainThread)
