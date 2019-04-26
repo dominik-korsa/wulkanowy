@@ -1,9 +1,8 @@
 package io.github.wulkanowy.ui.modules.homework
 
-import android.annotation.SuppressLint
 import android.view.View
 import eu.davidea.flexibleadapter.FlexibleAdapter
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
+import eu.davidea.flexibleadapter.items.AbstractSectionableItem
 import eu.davidea.flexibleadapter.items.IFlexible
 import eu.davidea.viewholders.FlexibleViewHolder
 import io.github.wulkanowy.R
@@ -11,19 +10,16 @@ import io.github.wulkanowy.data.db.entities.Homework
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_homework.*
 
-class HomeworkItem(val homework: Homework) : AbstractFlexibleItem<HomeworkItem.ViewHolder>() {
+class HomeworkItem(header: HomeworkHeader, val homework: Homework) :
+    AbstractSectionableItem<HomeworkItem.ViewHolder, HomeworkHeader>(header) {
 
-    override fun getLayoutRes(): Int = R.layout.item_homework
+    override fun getLayoutRes() = R.layout.item_homework
 
     override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<*>>): ViewHolder {
         return ViewHolder(view, adapter)
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun bindViewHolder(
-        adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder,
-        position: Int, payloads: MutableList<Any>?
-    ) {
+    override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder, position: Int, payloads: MutableList<Any>?) {
         holder.apply {
             homeworkItemSubject.text = homework.subject
             homeworkItemTeacher.text = homework.teacher
@@ -42,12 +38,12 @@ class HomeworkItem(val homework: Homework) : AbstractFlexibleItem<HomeworkItem.V
     }
 
     override fun hashCode(): Int {
-        return homework.hashCode()
+        var result = homework.hashCode()
+        result = 31 * result + homework.id.toInt()
+        return result
     }
 
-    class ViewHolder(val view: View, adapter: FlexibleAdapter<*>) : FlexibleViewHolder(view, adapter),
-        LayoutContainer {
-
+    class ViewHolder(val view: View, adapter: FlexibleAdapter<*>) : FlexibleViewHolder(view, adapter), LayoutContainer {
         override val containerView: View
             get() = contentView
     }

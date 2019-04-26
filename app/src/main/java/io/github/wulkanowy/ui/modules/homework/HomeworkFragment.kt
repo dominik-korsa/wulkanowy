@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import eu.davidea.flexibleadapter.FlexibleAdapter
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import io.github.wulkanowy.R
@@ -51,6 +52,10 @@ class HomeworkFragment : BaseSessionFragment(), HomeworkView, MainView.TitledVie
         homeworkRecycler.run {
             layoutManager = SmoothScrollLinearLayoutManager(context)
             adapter = homeworkAdapter
+            addItemDecoration(FlexibleItemDecoration(context)
+                .withDefaultDivider()
+                .withDrawDividerOnLastItem(false)
+            )
         }
         homeworkSwipe.setOnRefreshListener { presenter.onSwipeRefresh() }
         homeworkPreviousButton.setOnClickListener { presenter.onPreviousDay() }
@@ -65,7 +70,7 @@ class HomeworkFragment : BaseSessionFragment(), HomeworkView, MainView.TitledVie
         homeworkAdapter.clear()
     }
 
-    override fun updateNavigationDay(date: String) {
+    override fun updateNavigationWeek(date: String) {
         homeworkNavDate.text = date
     }
 
@@ -81,6 +86,10 @@ class HomeworkFragment : BaseSessionFragment(), HomeworkView, MainView.TitledVie
 
     override fun showProgress(show: Boolean) {
         homeworkProgress.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    override fun enableSwipe(enable: Boolean) {
+        homeworkSwipe.isEnabled = enable
     }
 
     override fun showContent(show: Boolean) {

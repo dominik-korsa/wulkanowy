@@ -2,10 +2,10 @@ package io.github.wulkanowy.ui.modules.attendance.summary
 
 import io.github.wulkanowy.data.db.entities.AttendanceSummary
 import io.github.wulkanowy.data.db.entities.Subject
-import io.github.wulkanowy.data.repositories.AttendanceSummaryRepository
-import io.github.wulkanowy.data.repositories.SemesterRepository
-import io.github.wulkanowy.data.repositories.StudentRepository
-import io.github.wulkanowy.data.repositories.SubjectRepostory
+import io.github.wulkanowy.data.repositories.attendancesummary.AttendanceSummaryRepository
+import io.github.wulkanowy.data.repositories.semester.SemesterRepository
+import io.github.wulkanowy.data.repositories.student.StudentRepository
+import io.github.wulkanowy.data.repositories.subject.SubjectRepository
 import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
 import io.github.wulkanowy.ui.base.session.SessionErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class AttendanceSummaryPresenter @Inject constructor(
     private val errorHandler: SessionErrorHandler,
     private val attendanceSummaryRepository: AttendanceSummaryRepository,
-    private val subjectRepository: SubjectRepostory,
+    private val subjectRepository: SubjectRepository,
     private val studentRepository: StudentRepository,
     private val semesterRepository: SemesterRepository,
     private val schedulers: SchedulersProvider,
@@ -51,6 +51,7 @@ class AttendanceSummaryPresenter @Inject constructor(
         view?.run {
             showContent(false)
             showProgress(true)
+            enableSwipe(false)
             clearView()
         }
         (subjects.singleOrNull { it.name == name }?.realId ?: -1).let {
@@ -74,6 +75,7 @@ class AttendanceSummaryPresenter @Inject constructor(
                     view?.run {
                         hideRefresh()
                         showProgress(false)
+                        enableSwipe(true)
                     }
                 }
                 .subscribe({
@@ -83,7 +85,7 @@ class AttendanceSummaryPresenter @Inject constructor(
                         showContent(it.first.isNotEmpty())
                         updateDataSet(it.first, it.second)
                     }
-                    analytics.logEvent("load_attendance_summary", mapOf("items" to it.first.size, "force_refresh" to forceRefresh, "item_id" to subjectId))
+                    analytics.logEvent("load_attendance_summary", "items" to it.first.size, "force_refresh" to forceRefresh, "item_id" to subjectId)
                 }) {
                     Timber.i("Loading attendance summary result: An exception occurred")
                     view?.run { showEmpty(isViewEmpty) }

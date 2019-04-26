@@ -1,5 +1,6 @@
 package io.github.wulkanowy.ui.modules.account
 
+import android.annotation.SuppressLint
 import android.view.View
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
@@ -14,13 +15,14 @@ class AccountItem(val student: Student) : AbstractFlexibleItem<AccountItem.ViewH
 
     override fun getLayoutRes() = R.layout.item_account
 
-    override fun createViewHolder(view: View?, adapter: FlexibleAdapter<IFlexible<*>>?): ViewHolder {
+    override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<*>>): ViewHolder {
         return ViewHolder(view, adapter)
     }
 
-    override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>?, holder: ViewHolder?, position: Int, payloads: MutableList<Any>?) {
-        holder?.apply {
-            accountItemName.text = student.studentName
+    @SuppressLint("SetTextI18n")
+    override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder, position: Int, payloads: MutableList<Any>?) {
+        holder.apply {
+            accountItemName.text = "${student.studentName} ${student.className}"
             accountItemSchool.text = student.schoolName
             accountItemImage.setBackgroundResource(if (student.isCurrent) R.drawable.ic_account_circular_border else 0)
         }
@@ -38,14 +40,13 @@ class AccountItem(val student: Student) : AbstractFlexibleItem<AccountItem.ViewH
     }
 
     override fun hashCode(): Int {
-        return student.hashCode()
+        var result = student.hashCode()
+        result = 31 * result + student.id.toInt()
+        return result
     }
 
-    class ViewHolder(view: View?, adapter: FlexibleAdapter<IFlexible<*>>?) : FlexibleViewHolder(view, adapter),
-        LayoutContainer {
-
-        override val containerView: View?
+    class ViewHolder(view: View, adapter: FlexibleAdapter<*>) : FlexibleViewHolder(view, adapter), LayoutContainer {
+        override val containerView: View
             get() = contentView
     }
 }
-

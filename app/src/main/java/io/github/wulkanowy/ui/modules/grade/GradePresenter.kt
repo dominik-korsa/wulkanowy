@@ -1,15 +1,13 @@
 package io.github.wulkanowy.ui.modules.grade
 
 import io.github.wulkanowy.data.db.entities.Semester
-import io.github.wulkanowy.data.repositories.SemesterRepository
-import io.github.wulkanowy.data.repositories.StudentRepository
+import io.github.wulkanowy.data.repositories.semester.SemesterRepository
+import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
 import io.github.wulkanowy.ui.base.session.SessionErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
 import io.github.wulkanowy.utils.SchedulersProvider
-import io.reactivex.Completable
 import timber.log.Timber
-import java.util.concurrent.TimeUnit.MILLISECONDS
 import javax.inject.Inject
 
 class GradePresenter @Inject constructor(
@@ -30,12 +28,16 @@ class GradePresenter @Inject constructor(
     fun onAttachView(view: GradeView, savedIndex: Int?) {
         super.onAttachView(view)
         Timber.i("Grade view is attached")
-        disposable.add(Completable.timer(150, MILLISECONDS, schedulers.mainThread)
-            .subscribe {
-                selectedIndex = savedIndex ?: 0
-                view.initView()
-                loadData()
-            })
+        selectedIndex = savedIndex ?: 0
+        view.run {
+            initView()
+            enableSwipe(false)
+        }
+        loadData()
+    }
+
+    fun onCreateMenu() {
+        if (semesters.isEmpty()) view?.showSemesterSwitch(false)
     }
 
     fun onViewReselected() {
@@ -57,7 +59,7 @@ class GradePresenter @Inject constructor(
                 notifyChildrenSemesterChange()
                 loadChild(it.currentPageIndex)
             }
-            analytics.logEvent("changed_semester", mapOf("number" to index + 1))
+            analytics.logEvent("changed_semester", "number" to index + 1)
         }
     }
 
@@ -69,12 +71,17 @@ class GradePresenter @Inject constructor(
         view?.apply {
             showContent(true)
             showProgress(false)
+            showEmpty(false)
             loadedSemesterId[currentPageIndex] = semesterId
         }
     }
 
     fun onPageSelected(index: Int) {
-        loadChild(index)
+        if (semesters.isNotEmpty()) loadChild(index)
+    }
+
+    fun onSwipeRefresh() {
+        loadData()
     }
 
     private fun loadData() {
@@ -89,17 +96,21 @@ class GradePresenter @Inject constructor(
             }
             .subscribeOn(schedulers.backgroundThread)
             .observeOn(schedulers.mainThread)
+            .doFinally { view?.showRefresh(false) }
             .subscribe({
                 view?.run {
                     Timber.i("Loading grade result: Attempt load index $currentPageIndex")
                     loadChild(currentPageIndex)
+                    enableSwipe(false)
+                    showSemesterSwitch(true)
                 }
             }) {
                 Timber.i("Loading grade result: An exception occurred")
                 errorHandler.dispatch(it)
                 view?.run {
                     showProgress(false)
-                    showEmpty()
+                    showEmpty(true)
+                    enableSwipe(true)
                 }
             })
     }
@@ -114,6 +125,6 @@ class GradePresenter @Inject constructor(
     }
 
     private fun notifyChildrenSemesterChange() {
-        for (i in 0..1) view?.notifyChildSemesterChange(i)
+        for (i in 0..2) view?.notifyChildSemesterChange(i)
     }
 }

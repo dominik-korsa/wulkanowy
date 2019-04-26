@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import androidx.preference.PreferenceManager
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.InternetObservingSettings
-import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.strategy.SocketInternetObservingStrategy
+import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.strategy.WalledGardenInternetObservingStrategy
 import com.readystatesoftware.chuck.api.ChuckCollector
 import com.readystatesoftware.chuck.api.ChuckInterceptor
 import com.readystatesoftware.chuck.api.RetentionManager
@@ -13,7 +13,7 @@ import dagger.Module
 import dagger.Provides
 import io.github.wulkanowy.api.Api
 import io.github.wulkanowy.data.db.AppDatabase
-import io.github.wulkanowy.data.repositories.PreferencesRepository
+import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
 import okhttp3.logging.HttpLoggingInterceptor.Level.NONE
@@ -27,8 +27,7 @@ internal class RepositoryModule {
     @Provides
     fun provideInternetObservingSettings(): InternetObservingSettings {
         return InternetObservingSettings.builder()
-            .strategy(SocketInternetObservingStrategy())
-            .host("www.google.com")
+            .strategy(WalledGardenInternetObservingStrategy())
             .build()
     }
 
@@ -50,7 +49,7 @@ internal class RepositoryModule {
     @Provides
     fun provideChuckCollector(context: Context, prefRepository: PreferencesRepository): ChuckCollector {
         return ChuckCollector(context)
-            .showNotification(prefRepository.isShowChuckerNotification)
+            .showNotification(prefRepository.isDebugNotificationEnable)
             .retentionManager(RetentionManager(context, ChuckCollector.Period.ONE_HOUR))
     }
 
@@ -81,6 +80,10 @@ internal class RepositoryModule {
     @Singleton
     @Provides
     fun provideGradeSummaryDao(database: AppDatabase) = database.gradeSummaryDao
+
+    @Singleton
+    @Provides
+    fun provideGradeStatisticsDao(database: AppDatabase) = database.gradeStatistics
 
     @Singleton
     @Provides
@@ -117,4 +120,16 @@ internal class RepositoryModule {
     @Singleton
     @Provides
     fun provideLuckyNumberDao(database: AppDatabase) = database.luckyNumberDao
+
+    @Singleton
+    @Provides
+    fun provideCompletedLessonsDao(database: AppDatabase) = database.completedLessonsDao
+
+    @Singleton
+    @Provides
+    fun provideReportingUnitDao(database: AppDatabase) = database.reportingUnitDao
+
+    @Singleton
+    @Provides
+    fun provideRecipientDao(database: AppDatabase) = database.recipientDao
 }

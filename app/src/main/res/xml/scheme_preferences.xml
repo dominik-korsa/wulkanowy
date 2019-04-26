@@ -13,12 +13,12 @@
             android:title="@string/pref_view_list"
             app:iconSpaceReserved="false" />
         <ListPreference
-            android:defaultValue="1"
-            android:entries="@array/theme_entries"
-            android:entryValues="@array/theme_values"
-            android:key="theme"
+            android:defaultValue="light"
+            android:entries="@array/app_theme_entries"
+            android:entryValues="@array/app_theme_values"
+            android:key="@string/pref_key_app_theme"
             android:summary="%s"
-            android:title="@string/pref_view_theme_dark"
+            android:title="@string/pref_view_app_theme"
             app:iconSpaceReserved="false" />
         <SwitchPreference
             android:defaultValue="true"
@@ -31,20 +31,12 @@
             android:title="@string/pref_view_expand_grade"
             app:iconSpaceReserved="false" />
         <ListPreference
-            android:defaultValue="0.0"
-            android:entries="@array/grade_modifier_entries"
-            android:entryValues="@array/grade_modifier_value"
-            android:key="@string/pref_key_grade_modifier_plus"
+            android:defaultValue="vulcan"
+            android:entries="@array/grade_color_scheme_entries"
+            android:entryValues="@array/grade_color_scheme_values"
+            android:key="@string/pref_key_grade_color_scheme"
             android:summary="%s"
-            android:title="@string/pref_view_grade_modifier_plus"
-            app:iconSpaceReserved="false" />
-        <ListPreference
-            android:defaultValue="0.0"
-            android:entries="@array/grade_modifier_entries"
-            android:entryValues="@array/grade_modifier_value"
-            android:key="@string/pref_key_grade_modifier_minus"
-            android:summary="%s"
-            android:title="@string/pref_view_grade_modifier_minus"
+            android:title="@string/pref_view_grade_color_scheme"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
     <PreferenceCategory
@@ -82,8 +74,41 @@
             app:iconSpaceReserved="false" />
         <SwitchPreference
             android:defaultValue="false"
-            android:key="@string/pref_key_debug_chucker_notification"
-            android:title="@string/pref_debug_notify_switch"
+            android:key="@string/pref_key_notification_debug"
+            android:title="@string/pref_notify_debug_switch"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_other_header"
+        app:iconSpaceReserved="false">
+        <ListPreference
+            android:defaultValue="0.0"
+            android:entries="@array/grade_modifier_entries"
+            android:entryValues="@array/grade_modifier_value"
+            android:key="@string/pref_key_grade_modifier_plus"
+            android:summary="%s"
+            android:title="@string/pref_other_grade_modifier_plus"
+            app:iconSpaceReserved="false" />
+        <ListPreference
+            android:defaultValue="0.0"
+            android:entries="@array/grade_modifier_entries"
+            android:entryValues="@array/grade_modifier_value"
+            android:key="@string/pref_key_grade_modifier_minus"
+            android:summary="%s"
+            android:title="@string/pref_other_grade_modifier_minus"
+            app:iconSpaceReserved="false" />
+        <ListPreference
+            android:defaultValue="only_one_semester"
+            android:entries="@array/grade_average_mode_entries"
+            android:entryValues="@array/grade_average_mode_values"
+            android:key="@string/pref_key_grade_average_mode"
+            android:summary="%s"
+            android:title="@string/pref_view_grade_average_mode"
+            app:iconSpaceReserved="false" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_fill_message_content"
+            android:title="@string/pref_other_fill_message_content"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
 </PreferenceScreen>

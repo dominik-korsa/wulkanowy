@@ -14,6 +14,7 @@ import io.github.wulkanowy.R
 import io.github.wulkanowy.ui.base.BaseFragmentPagerAdapter
 import io.github.wulkanowy.ui.base.session.BaseSessionFragment
 import io.github.wulkanowy.ui.modules.grade.details.GradeDetailsFragment
+import io.github.wulkanowy.ui.modules.grade.statistics.GradeStatisticsFragment
 import io.github.wulkanowy.ui.modules.grade.summary.GradeSummaryFragment
 import io.github.wulkanowy.ui.modules.main.MainView
 import io.github.wulkanowy.utils.setOnSelectPageListener
@@ -27,6 +28,8 @@ class GradeFragment : BaseSessionFragment(), GradeView, MainView.MainChildView, 
 
     @Inject
     lateinit var pagerAdapter: BaseFragmentPagerAdapter
+
+    private var semesterSwitchMenu: MenuItem? = null
 
     companion object {
         private const val SAVED_SEMESTER_KEY = "CURRENT_SEMESTER"
@@ -54,25 +57,33 @@ class GradeFragment : BaseSessionFragment(), GradeView, MainView.MainChildView, 
         presenter.onAttachView(this, savedInstanceState?.getInt(SAVED_SEMESTER_KEY))
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.action_menu_grade, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.action_menu_grade, menu)
+        semesterSwitchMenu = menu.findItem(R.id.gradeMenuSemester)
+        presenter.onCreateMenu()
     }
 
     override fun initView() {
-        pagerAdapter.addFragmentsWithTitle(mapOf(
-            GradeDetailsFragment.newInstance() to getString(R.string.all_details),
-            GradeSummaryFragment.newInstance() to getString(R.string.grade_menu_summary)
-        ))
+        pagerAdapter.apply {
+            containerId = gradeViewPager.id
+            addFragmentsWithTitle(mapOf(
+                GradeDetailsFragment.newInstance() to getString(R.string.all_details),
+                GradeSummaryFragment.newInstance() to getString(R.string.grade_menu_summary),
+                GradeStatisticsFragment.newInstance() to getString(R.string.grade_menu_statistics)
+            ))
+        }
 
         gradeViewPager.run {
             adapter = pagerAdapter
+            offscreenPageLimit = 3
             setOnSelectPageListener { presenter.onPageSelected(it) }
         }
         gradeTabLayout.setupWithViewPager(gradeViewPager)
+        gradeSwipe.setOnRefreshListener { presenter.onSwipeRefresh() }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return if (item?.itemId == R.id.gradeMenuSemester) presenter.onSemesterSwitch()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == R.id.gradeMenuSemester) presenter.onSemesterSwitch()
         else false
     }
 
@@ -89,8 +100,20 @@ class GradeFragment : BaseSessionFragment(), GradeView, MainView.MainChildView, 
         gradeProgress.visibility = if (show) VISIBLE else INVISIBLE
     }
 
-    override fun showEmpty() {
-        gradeEmpty.visibility = VISIBLE
+    override fun showEmpty(show: Boolean) {
+        gradeEmpty.visibility = if (show) VISIBLE else INVISIBLE
+    }
+
+    override fun showRefresh(show: Boolean) {
+        gradeSwipe.isRefreshing = show
+    }
+
+    override fun showSemesterSwitch(show: Boolean) {
+        semesterSwitchMenu?.isVisible = show
+    }
+
+    override fun enableSwipe(enable: Boolean) {
+        gradeSwipe.isEnabled = enable
     }
 
     override fun showSemesterDialog(selectedIndex: Int) {

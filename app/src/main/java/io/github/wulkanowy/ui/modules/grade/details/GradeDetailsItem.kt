@@ -14,8 +14,12 @@ import io.github.wulkanowy.utils.toFormattedString
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_grade_details.*
 
-class GradeDetailsItem(val grade: Grade, private val weightString: String, private val valueColor: Int) :
-    AbstractFlexibleItem<GradeDetailsItem.ViewHolder>() {
+class GradeDetailsItem(
+    val grade: Grade,
+    private val valueBgColor: Int,
+    private val weightString: String,
+    private val noDescriptionString: String
+) : AbstractFlexibleItem<GradeDetailsItem.ViewHolder>() {
 
     override fun getLayoutRes() = R.layout.item_grade_details
 
@@ -24,16 +28,17 @@ class GradeDetailsItem(val grade: Grade, private val weightString: String, priva
     }
 
     @SuppressLint("SetTextI18n")
-    override fun bindViewHolder(
-        adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder,
-        position: Int, payloads: MutableList<Any>?
-    ) {
+    override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder, position: Int, payloads: MutableList<Any>?) {
         holder.run {
             gradeItemValue.run {
                 text = grade.entry
-                setBackgroundResource(valueColor)
+                setBackgroundResource(valueBgColor)
             }
-            gradeItemDescription.text = if (grade.description.isNotBlank()) grade.description else grade.gradeSymbol
+            gradeItemDescription.text = when {
+                grade.description.isNotBlank() -> grade.description
+                grade.gradeSymbol.isNotBlank() -> grade.gradeSymbol
+                else -> noDescriptionString
+            }
             gradeItemDate.text = grade.date.toFormattedString()
             gradeItemWeight.text = "$weightString: ${grade.weight}"
             gradeItemNote.visibility = if (!grade.isRead) VISIBLE else GONE
@@ -49,7 +54,7 @@ class GradeDetailsItem(val grade: Grade, private val weightString: String, priva
         if (grade != other.grade) return false
         if (grade.id != other.grade.id) return false
         if (weightString != other.weightString) return false
-        if (valueColor != other.valueColor) return false
+        if (valueBgColor != other.valueBgColor) return false
 
         return true
     }
@@ -58,13 +63,11 @@ class GradeDetailsItem(val grade: Grade, private val weightString: String, priva
         var result = grade.hashCode()
         result = 31 * result + grade.id.toInt()
         result = 31 * result + weightString.hashCode()
-        result = 31 * result + valueColor
+        result = 31 * result + valueBgColor
         return result
     }
 
-    class ViewHolder(view: View, adapter: FlexibleAdapter<*>) : FlexibleViewHolder(view, adapter),
-        LayoutContainer {
-
+    class ViewHolder(view: View, adapter: FlexibleAdapter<*>) : FlexibleViewHolder(view, adapter), LayoutContainer {
         override val containerView: View
             get() = contentView
     }

@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">Wulkanowy</string>
 
+
     <!--Activity/Fragment title-->
-    <string name="login_title">Select student</string>
+    <string name="login_title">Login</string>
     <string name="main_title">Wulkanowy</string>
     <string name="grade_title">Grades</string>
     <string name="attendance_title">Attendance</string>
@@ -12,6 +13,7 @@
     <string name="more_title">More</string>
     <string name="about_title">About</string>
     <string name="message_title">Messages</string>
+    <string name="send_message_title">New message</string>
     <string name="note_title">Notes and achievements</string>
     <string name="homework_title">Homework</string>
     <string name="account_title">Choose account</string>
@@ -22,16 +24,17 @@
     <string name="login_header_symbol">Enter the VULCAN diary symbol</string>
     <string name="login_nickname_hint">Email or nick</string>
     <string name="login_password_hint">Password</string>
-    <string name="login_host_hint">Log</string>
+    <string name="login_host_hint">Register</string>
     <string name="login_symbol_hint">Symbol</string>
     <string name="login_sign_in">Sign in</string>
-    <string name="login_progress">Logging in&#8230;</string>
-    <string name="login_sync">Synchronization&#8230;</string>
     <string name="login_invalid_password">This password is too short</string>
-    <string name="login_incorrect_password">This password is incorrect</string>
+    <string name="login_incorrect_password">Login details are incorrect</string>
     <string name="login_incorrect_symbol">Student not found. Check the symbol</string>
     <string name="login_field_required">This field is required</string>
-    <string name="login_duplicate_student">This student has already been logged in</string>
+    <string name="login_duplicate_student">The selected student is already logged in</string>
+    <string name="login_symbol_helper">The symbol is located on the register page in the Mobile Access tab</string>
+    <string name="login_select_student">Select students to log in to the application</string>
+    <string name="login_privacy_policy">Privacy policy</string>
 
 
     <!--Main-->
@@ -59,29 +62,21 @@
     <string name="grade_summary_calculated_average">Calculated average</string>
     <string name="grade_summary_final_average">Final average</string>
     <string name="grade_menu_summary">Summary</string>
+    <string name="grade_menu_statistics">Class</string>
     <string name="grade_menu_read">Mark as read</string>
+    <string name="grade_statistics_partial">Partial grades</string>
+    <string name="grade_statistics_semester">Semester grades</string>
     <plurals name="grade_number_item">
         <item quantity="one">%d grade</item>
         <item quantity="other">%d grades</item>
     </plurals>
-
     <plurals name="grade_new_items">
         <item quantity="one">New grade</item>
         <item quantity="other">New grades</item>
     </plurals>
-
-    <!--Grade notify-->
-    <string name="notify_grade_channel">New grades</string>
-    <plurals name="notify_grade_new_items">
+    <plurals name="grade_notify_new_items">
         <item quantity="one">You received %1$d grade</item>
         <item quantity="other">You received %1$d grades</item>
-    </plurals>
-
-    <!--Note notify-->
-    <string name="notify_note_channel">New notes</string>
-    <plurals name="notify_note_new_items">
-        <item quantity="one">You received %1$d note</item>
-        <item quantity="other">You received %1$d notes</item>
     </plurals>
 
 
@@ -92,6 +87,15 @@
     <string name="timetable_time">Hours</string>
     <string name="timetable_changes">Changes</string>
     <string name="timetable_no_items">No lessons this day</string>
+
+
+    <!--Completed lessons-->
+    <string name="completed_lessons_title">Completed lessons</string>
+    <string name="completed_lessons_button">Show completed lessons</string>
+    <string name="completed_lessons_no_items">No info about completed lessons</string>
+    <string name="completed_lessons_topic">Topic</string>
+    <string name="completed_lessons_absence">Absence</string>
+    <string name="completed_lessons_resources">Resources</string>
 
 
     <!--Attendance-->
@@ -110,6 +114,7 @@
         <item quantity="other">%1$d absences</item>
     </plurals>
 
+
     <!--Attendance summary-->
     <string name="attendance_summary_final">Attendance</string>
 
@@ -127,29 +132,33 @@
     <string name="message_no_subject">(no subject)</string>
     <string name="message_no_items">No messages</string>
     <string name="message_preview_error">An error occurred while downloading message content</string>
-    <string name="message_from">From: %s</string>
-    <string name="message_to">To: %s</string>
+    <string name="message_from">From:</string>
+    <string name="message_to">To:</string>
     <string name="message_date">Date: %s</string>
+    <string name="message_reply">Reply</string>
+    <string name="message_forward">Forward</string>
+    <string name="message_delete">Delete</string>
+    <string name="message_move_to_bin">Move to trash</string>
+    <string name="message_delete_forever">Delete permanently</string>
+    <string name="message_delete_success">Message deleted successfully</string>
+    <string name="message_subject">Subject</string>
+    <string name="message_content">Content</string>
+    <string name="message_send_successful">Message sent successfully</string>
+    <string name="message_required_recipients">You need to choose at least 1 recipient</string>
+    <string name="message_content_min_length">The message content must be at least 3 characters</string>
     <plurals name="message_number_item">
         <item quantity="one">%d message</item>
         <item quantity="other">%d messages</item>
     </plurals>
-
     <plurals name="message_new_items">
         <item quantity="one">New message</item>
         <item quantity="other">New messages</item>
     </plurals>
-
-    <!--Message notify-->
-    <string name="notify_message_channel">New messages</string>
-    <plurals name="notify_message_new_items">
+    <plurals name="message_notify_new_items">
         <item quantity="one">You received %1$d message</item>
         <item quantity="other">You received %1$d messages</item>
     </plurals>
 
-    <!--About-->
-    <string name="about_source_code">Source code</string>
-    <string name="about_feedback">Report a bug</string>
 
     <!--Note-->
     <string name="note_no_items">No info about notes</string>
@@ -157,31 +166,39 @@
         <item quantity="one">%d note</item>
         <item quantity="other">%d notes</item>
     </plurals>
-
     <plurals name="note_new_items">
         <item quantity="one">New note</item>
         <item quantity="other">New notes</item>
+    </plurals>
+    <plurals name="note_notify_new_items">
+        <item quantity="one">You received %1$d note</item>
+        <item quantity="other">You received %1$d notes</item>
     </plurals>
 
 
     <!--Homework-->
     <string name="homework_no_items">No info about homework</string>
 
+
     <!--Lucky number-->
     <string name="lucky_number_title">Lucky number</string>
     <string name="lucky_number_header">Today\'s lucky number is</string>
     <string name="lucky_number_empty">No info about the lucky number</string>
+    <string name="lucky_number_notify_new_item_title">Lucky number for today</string>
+    <string name="lucky_number_notify_new_item">Today\'s lucky number is: %d</string>
 
-    <!--Lucky number notify-->
-    <string name="notify_lucky_number_channel">New lucky numbers</string>
-    <string name="notify_lucky_number_new_item_title">Lucky number for today</string>
-    <string name="notify_lucky_number_new_item">Today\'s lucky number is: %d</string>
 
     <!--Account-->
     <string name="account_add_new">Add account</string>
     <string name="account_logout">Logout</string>
     <string name="account_confirm">Do you want to log out of an active student?</string>
     <string name="account_logout_student">Student logout</string>
+
+
+    <!--About-->
+    <string name="about_discord_invite">Discord</string>
+    <string name="about_feedback">Report a bug</string>
+    <string name="about_homepage">Homepage</string>
 
 
     <!--Generic-->
@@ -203,29 +220,36 @@
 
     <!--Timetable Widget-->
     <string name="widget_timetable_no_items">No lessons</string>
-    <string name="widget_timetable_today">Today</string>
-    <string name="widget_timetable_tomorrow">Tomorrow</string>
 
 
     <!--Preferences-->
-    <string name="pref_view_header">View</string>
+    <string name="pref_view_header">Appearance</string>
     <string name="pref_view_list">Default view</string>
-    <string name="pref_view_summary">Show the summary in the grades</string>
+    <string name="pref_view_grade_average_mode">Calculation of the end-of-year average</string>
     <string name="pref_view_present">Show presence in attendance</string>
-    <string name="pref_view_theme_dark">Dark theme (Beta)</string>
-    <string name="pref_view_grade_modifier_plus">Value of the plus</string>
-    <string name="pref_view_grade_modifier_minus">Value of the minus</string>
+    <string name="pref_view_app_theme">Application theme</string>
     <string name="pref_view_expand_grade">Expand grades</string>
+    <string name="pref_view_grade_color_scheme">Grades color scheme</string>
 
     <string name="pref_notify_header">Notifications</string>
     <string name="pref_notify_switch">Show notifications</string>
-    <string name="pref_debug_notify_switch">Show debug notifications</string>
+    <string name="pref_notify_debug_switch">Show debug notifications</string>
 
     <string name="pref_services_header">Synchronization</string>
     <string name="pref_services_switch">Automatic update</string>
     <string name="pref_services_suspended">Suspended on holiday</string>
     <string name="pref_services_interval">Updates interval</string>
     <string name="pref_services_wifi">Wi-Fi only</string>
+
+    <string name="pref_other_header">Other</string>
+    <string name="pref_other_grade_modifier_plus">Value of the plus</string>
+    <string name="pref_other_grade_modifier_minus">Value of the minus</string>
+    <string name="pref_other_fill_message_content">Reply with message history</string>
+
+
+    <!--Notification Channels-->
+    <string name="channel_new_entries">New entries in register</string>
+    <string name="channel_debug">Debug</string>
 
 
     <!--Colors-->
@@ -240,10 +264,12 @@
     <!--Others-->
     <string name="all_copied">Copied</string>
 
+
     <!--Errors-->
     <string name="error_no_internet">No internet connection</string>
     <string name="error_timeout">Too long wait for connection</string>
     <string name="error_login_failed">Login is failed. Try again or restart the app</string>
     <string name="error_service_unavailable">The log is not available. Try again later</string>
     <string name="error_unknown">An unexpected error occurred</string>
+    <string name="error_feature_disabled">Feature disabled by your school</string>
 </resources>

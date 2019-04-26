@@ -2,9 +2,9 @@ package io.github.wulkanowy.ui.modules.main
 
 import com.google.firebase.analytics.FirebaseAnalytics.Event.APP_OPEN
 import com.google.firebase.analytics.FirebaseAnalytics.Param.DESTINATION
-import io.github.wulkanowy.data.repositories.PreferencesRepository
-import io.github.wulkanowy.data.repositories.StudentRepository
-import io.github.wulkanowy.services.job.ServiceHelper
+import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
+import io.github.wulkanowy.data.repositories.student.StudentRepository
+import io.github.wulkanowy.services.sync.SyncManager
 import io.github.wulkanowy.ui.base.BasePresenter
 import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
@@ -17,27 +17,27 @@ class MainPresenter @Inject constructor(
     private val errorHandler: ErrorHandler,
     private val studentRepository: StudentRepository,
     private val prefRepository: PreferencesRepository,
+    private val syncManager: SyncManager,
     private val schedulers: SchedulersProvider,
-    private val serviceHelper: ServiceHelper,
     private val analytics: FirebaseAnalyticsHelper
 ) : BasePresenter<MainView>(errorHandler) {
 
     fun onAttachView(view: MainView, initMenuIndex: Int) {
         super.onAttachView(view)
-        Timber.i("Main view is attached with $initMenuIndex menu index")
         view.run {
-            cancelNotifications()
             startMenuIndex = if (initMenuIndex != -1) initMenuIndex else prefRepository.startMenuIndex
+            Timber.i("Main view is attached with $startMenuIndex menu index")
             initView()
         }
-        serviceHelper.startFullSyncService()
 
-        analytics.logEvent(APP_OPEN, mapOf(DESTINATION to when (initMenuIndex) {
+        syncManager.startSyncWorker()
+
+        analytics.logEvent(APP_OPEN, DESTINATION to when (initMenuIndex) {
             1 -> "Grades"
             3 -> "Timetable"
             4 -> "More"
             else -> "User action"
-        }))
+        })
     }
 
     fun onViewChange() {
@@ -92,8 +92,7 @@ class MainPresenter @Inject constructor(
                 if (it.isNotEmpty()) {
                     Timber.i("Switching current student")
                     studentRepository.switchStudent(it[0])
-                }
-                else Completable.complete()
+                } else Completable.complete()
             }
             .subscribeOn(schedulers.backgroundThread)
             .observeOn(schedulers.mainThread)

@@ -46,6 +46,9 @@ class GradeDetailsFragment : BaseSessionFragment(), GradeDetailsView, GradeView.
     override val weightString: String
         get() = getString(R.string.grade_weight)
 
+    override val noDescriptionString: String
+        get() = getString(R.string.all_no_description)
+
     override val isViewEmpty
         get() = gradeDetailsAdapter.isEmpty
 
@@ -64,8 +67,8 @@ class GradeDetailsFragment : BaseSessionFragment(), GradeDetailsView, GradeView.
         presenter.onAttachView(this)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.action_menu_grade_details, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.action_menu_grade_details, menu)
     }
 
     override fun initView() {
@@ -78,12 +81,15 @@ class GradeDetailsFragment : BaseSessionFragment(), GradeDetailsView, GradeView.
         gradeDetailsRecycler.run {
             layoutManager = SmoothScrollLinearLayoutManager(context)
             adapter = gradeDetailsAdapter
+            addItemDecoration(GradeDetailsHeaderItemDecoration(context)
+                .withDefaultDivider(R.layout.header_grade_details)
+            )
         }
         gradeDetailsSwipe.setOnRefreshListener { presenter.onSwipeRefresh() }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return if (item?.itemId == R.id.gradeDetailsMenuRead) presenter.onMarkAsReadSelected()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == R.id.gradeDetailsMenuRead) presenter.onMarkAsReadSelected()
         else false
     }
 
@@ -119,6 +125,10 @@ class GradeDetailsFragment : BaseSessionFragment(), GradeDetailsView, GradeView.
         gradeDetailsProgress.visibility = if (show) VISIBLE else GONE
     }
 
+    override fun enableSwipe(enable: Boolean) {
+        gradeDetailsSwipe.isEnabled = enable
+    }
+
     override fun showContent(show: Boolean) {
         gradeDetailsRecycler.visibility = if (show) VISIBLE else INVISIBLE
     }
@@ -131,8 +141,8 @@ class GradeDetailsFragment : BaseSessionFragment(), GradeDetailsView, GradeView.
         gradeDetailsSwipe.isRefreshing = show
     }
 
-    override fun showGradeDialog(grade: Grade) {
-        (activity as? MainActivity)?.showDialogFragment(GradeDetailsDialog.newInstance(grade))
+    override fun showGradeDialog(grade: Grade, colorScheme: String) {
+        (activity as? MainActivity)?.showDialogFragment(GradeDetailsDialog.newInstance(grade, colorScheme))
     }
 
     override fun onParentLoadData(semesterId: Int, forceRefresh: Boolean) {

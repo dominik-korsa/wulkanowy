@@ -1,7 +1,11 @@
-Wersja 0.6.6
+Wersja 0.7.5
 
-- poprawiono problemy ze stabilnością w widoku ocen i wiadomości
-- naprawiono wyświetlanie powiadomień po ich ponownym włączeniu po długim czasie
-- ograniczono ilość zbędnych informacji na widżecie planu lekcji
+Uwaga! Jeżeli w aplikacji przestały wyświetlać się oceny, prosimy o wylogowanie i zalogowanie się ponownie!
 
-Pełna lista zmian: https://github.com/wulkanowy/wulkanowy/releases/tag/0.6.6
+Naprawiliśmy:
+- problem z brakiem aktywnego semestru
+- logowanie w niestandardowych dziennikach na vulcan.net.pl
+- oznaczanie lekcji w planie jako odwołanej, jeśli brak opisu tej zmiany
+- ładowanie wiadomości, jeśli byli zalogowani jednocześnie uczeń i rodzic
+
+Pełna lista zmian: https://github.com/wulkanowy/wulkanowy/releases/tag/0.7.5

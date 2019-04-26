@@ -2,8 +2,9 @@ package io.github.wulkanowy.ui.modules.message.tab
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import io.github.wulkanowy.data.db.entities.Message
-import io.github.wulkanowy.data.repositories.MessagesRepository
-import io.github.wulkanowy.data.repositories.StudentRepository
+import io.github.wulkanowy.data.repositories.message.MessageFolder
+import io.github.wulkanowy.data.repositories.message.MessageRepository
+import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
 import io.github.wulkanowy.ui.base.session.SessionErrorHandler
 import io.github.wulkanowy.ui.modules.message.MessageItem
@@ -15,14 +16,14 @@ import javax.inject.Inject
 class MessageTabPresenter @Inject constructor(
     private val errorHandler: SessionErrorHandler,
     private val schedulers: SchedulersProvider,
-    private val messagesRepository: MessagesRepository,
+    private val messageRepository: MessageRepository,
     private val studentRepository: StudentRepository,
     private val analytics: FirebaseAnalyticsHelper
 ) : BaseSessionPresenter<MessageTabView>(errorHandler) {
 
-    lateinit var folder: MessagesRepository.MessageFolder
+    lateinit var folder: MessageFolder
 
-    fun onAttachView(view: MessageTabView, folder: MessagesRepository.MessageFolder) {
+    fun onAttachView(view: MessageTabView, folder: MessageFolder) {
         super.onAttachView(view)
         view.initView()
         this.folder = folder
@@ -33,12 +34,34 @@ class MessageTabPresenter @Inject constructor(
         onParentViewLoadData(true)
     }
 
+    fun onDeleteMessage() {
+        loadData(false)
+    }
+
     fun onParentViewLoadData(forceRefresh: Boolean) {
+        loadData(forceRefresh)
+    }
+
+    fun onMessageItemSelected(item: AbstractFlexibleItem<*>) {
+        if (item is MessageItem) {
+            Timber.i("Select message ${item.message.realId} item")
+            view?.run {
+                openMessage(item.message.realId)
+                if (item.message.unread) {
+                    item.message.unread = false
+                    updateItem(item)
+                    updateMessage(item.message)
+                }
+            }
+        }
+    }
+
+    private fun loadData(forceRefresh: Boolean) {
         Timber.i("Loading $folder message data started")
         disposable.apply {
             clear()
             add(studentRepository.getCurrentStudent()
-                .flatMap { messagesRepository.getMessages(it, folder, forceRefresh) }
+                .flatMap { messageRepository.getMessages(it, folder, forceRefresh) }
                 .map { items -> items.map { MessageItem(it, view?.noSubjectString.orEmpty()) } }
                 .subscribeOn(schedulers.backgroundThread)
                 .observeOn(schedulers.mainThread)
@@ -46,6 +69,7 @@ class MessageTabPresenter @Inject constructor(
                     view?.run {
                         showRefresh(false)
                         showProgress(false)
+                        enableSwipe(true)
                         notifyParentDataLoaded()
                     }
                 }
@@ -56,7 +80,7 @@ class MessageTabPresenter @Inject constructor(
                         showContent(it.isNotEmpty())
                         updateData(it)
                     }
-                    analytics.logEvent("load_messages", mapOf("items" to it.size, "folder" to folder.name))
+                    analytics.logEvent("load_messages", "items" to it.size, "folder" to folder.name)
                 }) {
                     Timber.i("Loading $folder message result: An exception occurred")
                     view?.run { showEmpty(isViewEmpty) }
@@ -65,23 +89,9 @@ class MessageTabPresenter @Inject constructor(
         }
     }
 
-    fun onMessageItemSelected(item: AbstractFlexibleItem<*>) {
-        if (item is MessageItem) {
-            Timber.i("Select message ${item.message.realId} item")
-            view?.run {
-                openMessage(item.message.realId)
-                if (item.message.unread == true) {
-                    item.message.unread = false
-                    updateItem(item)
-                    updateMessage(item.message)
-                }
-            }
-        }
-    }
-
     private fun updateMessage(message: Message) {
         Timber.i("Attempt to update message ${message.realId}")
-        disposable.add(messagesRepository.updateMessage(message)
+        disposable.add(messageRepository.updateMessage(message)
             .subscribeOn(schedulers.backgroundThread)
             .observeOn(schedulers.mainThread)
             .subscribe({ Timber.d("Update message ${message.realId} result: Success") })

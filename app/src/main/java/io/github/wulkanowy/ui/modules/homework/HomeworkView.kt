@@ -11,7 +11,7 @@ interface HomeworkView : BaseSessionView {
 
     fun clearData()
 
-    fun updateNavigationDay(date: String)
+    fun updateNavigationWeek(date: String)
 
     fun isViewEmpty(): Boolean
 
@@ -20,6 +20,8 @@ interface HomeworkView : BaseSessionView {
     fun showEmpty(show: Boolean)
 
     fun showProgress(show: Boolean)
+
+    fun enableSwipe(enable: Boolean)
 
     fun showContent(show: Boolean)
 

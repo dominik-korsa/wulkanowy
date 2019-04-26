@@ -1,5 +1,6 @@
 package io.github.wulkanowy.utils
 
+import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.DayOfWeek.FRIDAY
 import org.threeten.bp.DayOfWeek.MONDAY
 import org.threeten.bp.DayOfWeek.SATURDAY
@@ -35,6 +36,8 @@ fun String.toLocalDate(format: String = DATE_PATTERN): LocalDate {
 fun LocalDate.toFormattedString(format: String = DATE_PATTERN): String = this.format(ofPattern(format))
 
 fun LocalDateTime.toFormattedString(format: String = DATE_PATTERN): String = this.format(ofPattern(format))
+
+fun LocalDateTime.toDate(): Date = DateTimeUtils.toDate(atZone(ZoneId.systemDefault()).toInstant())
 
 /**
  * https://github.com/ThreeTen/threetenbp/issues/55
@@ -95,6 +98,9 @@ inline val LocalDate.previousOrSameSchoolDay: LocalDate
 
 inline val LocalDate.weekDayName: String
     get() = this.format(ofPattern("EEEE", Locale.getDefault()))
+
+inline val LocalDate.shortcutWeekDayName: String
+    get() = this.format(ofPattern("EEE", Locale.getDefault()))
 
 inline val LocalDate.monday: LocalDate
     get() = this.with(MONDAY)

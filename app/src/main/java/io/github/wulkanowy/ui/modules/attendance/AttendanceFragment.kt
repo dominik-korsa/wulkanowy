@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import eu.davidea.flexibleadapter.FlexibleAdapter
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import io.github.wulkanowy.R
@@ -66,18 +67,22 @@ class AttendanceFragment : BaseSessionFragment(), AttendanceView, MainView.MainC
         attendanceRecycler.run {
             layoutManager = SmoothScrollLinearLayoutManager(context)
             adapter = attendanceAdapter
+            addItemDecoration(FlexibleItemDecoration(context)
+                .withDefaultDivider()
+                .withDrawDividerOnLastItem(false)
+            )
         }
         attendanceSwipe.setOnRefreshListener { presenter.onSwipeRefresh() }
         attendancePreviousButton.setOnClickListener { presenter.onPreviousDay() }
         attendanceNextButton.setOnClickListener { presenter.onNextDay() }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.action_menu_attendance, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.action_menu_attendance, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return if (item?.itemId == R.id.attendanceMenuSummary) presenter.onSummarySwitchSelected()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == R.id.attendanceMenuSummary) presenter.onSummarySwitchSelected()
         else false
     }
 
@@ -111,6 +116,10 @@ class AttendanceFragment : BaseSessionFragment(), AttendanceView, MainView.MainC
 
     override fun showProgress(show: Boolean) {
         attendanceProgress.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    override fun enableSwipe(enable: Boolean) {
+        attendanceSwipe.isEnabled = enable
     }
 
     override fun showContent(show: Boolean) {

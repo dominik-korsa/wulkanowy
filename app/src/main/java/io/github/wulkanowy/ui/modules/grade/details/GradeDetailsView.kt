@@ -16,6 +16,8 @@ interface GradeDetailsView : BaseSessionView {
 
     val weightString: String
 
+    val noDescriptionString: String
+
     fun initView()
 
     fun updateData(data: List<GradeDetailsHeader>)
@@ -28,13 +30,15 @@ interface GradeDetailsView : BaseSessionView {
 
     fun collapseAllItems()
 
-    fun showGradeDialog(grade: Grade)
+    fun showGradeDialog(grade: Grade, colorScheme: String)
 
     fun showContent(show: Boolean)
 
     fun showEmpty(show: Boolean)
 
     fun showProgress(show: Boolean)
+
+    fun enableSwipe(enable: Boolean)
 
     fun showRefresh(show: Boolean)
 

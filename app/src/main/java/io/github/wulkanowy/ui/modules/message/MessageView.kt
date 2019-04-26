@@ -14,8 +14,7 @@ interface MessageView : BaseView {
 
     fun notifyChildLoadData(index: Int, forceRefresh: Boolean)
 
-    interface MessageChildView {
+    fun notifyChildMessageDeleted(tabId: Int)
 
-        fun onParentLoadData(forceRefresh: Boolean)
-    }
+    fun openSendMessage()
 }

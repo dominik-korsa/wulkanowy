@@ -14,14 +14,22 @@ class ApiHelper @Inject constructor(private val api: Api) {
             symbol = student.symbol
             schoolSymbol = student.schoolSymbol
             studentId = student.studentId
-            useNewStudent = false
+            classId = student.classId
             host = URL(student.endpoint).run { host + ":$port".removeSuffix(":-1") }
             ssl = student.endpoint.startsWith("https")
             loginType = Api.LoginType.valueOf(student.loginType)
+            useNewStudent = true
         }
     }
 
     fun initApi(email: String, password: String, symbol: String, endpoint: String) {
-        initApi(Student(email = email, password = password, symbol = symbol, endpoint = endpoint, loginType = "AUTO"))
+        api.apply {
+            this.email = email
+            this.password = password
+            this.symbol = symbol
+            host = URL(endpoint).run { host + ":$port".removeSuffix(":-1") }
+            ssl = endpoint.startsWith("https")
+            useNewStudent = true
+        }
     }
 }

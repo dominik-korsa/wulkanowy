@@ -33,8 +33,6 @@ class LuckyNumberFragment : BaseSessionFragment(), LuckyNumberView, MainView.Tit
     }
 
     override fun initView() {
-        showContent(false)
-        showProgress(true)
         luckyNumberSwipe.setOnRefreshListener { presenter.onSwipeRefresh() }
     }
 
@@ -54,11 +52,20 @@ class LuckyNumberFragment : BaseSessionFragment(), LuckyNumberView, MainView.Tit
         luckyNumberProgress.visibility = if (show) View.VISIBLE else View.GONE
     }
 
+    override fun enableSwipe(enable: Boolean) {
+        luckyNumberSwipe.isEnabled = enable
+    }
+
     override fun showContent(show: Boolean) {
         luckyNumberContent.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     override fun isViewEmpty(): Boolean {
         return luckyNumberText.text.isBlank()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.onDetachView()
     }
 }

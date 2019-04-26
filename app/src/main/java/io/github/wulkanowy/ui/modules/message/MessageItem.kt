@@ -20,17 +20,14 @@ class MessageItem(val message: Message, private val noSubjectString: String) :
         return ViewHolder(view, adapter)
     }
 
-    override fun getLayoutRes(): Int = R.layout.item_message
+    override fun getLayoutRes() = R.layout.item_message
 
-    override fun bindViewHolder(
-        adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder,
-        position: Int, payloads: MutableList<Any>?
-    ) {
+    override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder, position: Int, payloads: MutableList<Any>?) {
         holder.apply {
-            val style = if (message.unread == true) BOLD else NORMAL
+            val style = if (message.unread) BOLD else NORMAL
 
             messageItemAuthor.run {
-                text = if (message.recipient?.isNotBlank() == true) message.recipient else message.sender
+                text = if (message.recipient.isNotBlank()) message.recipient else message.sender
                 setTypeface(null, style)
             }
             messageItemSubject.run {
@@ -38,7 +35,7 @@ class MessageItem(val message: Message, private val noSubjectString: String) :
                 setTypeface(null, style)
             }
             messageItemDate.run {
-                text = message.date?.toFormattedString()
+                text = message.date.toFormattedString()
                 setTypeface(null, style)
             }
         }
@@ -58,9 +55,7 @@ class MessageItem(val message: Message, private val noSubjectString: String) :
         return message.hashCode()
     }
 
-    class ViewHolder(val view: View, adapter: FlexibleAdapter<*>) : FlexibleViewHolder(view, adapter),
-        LayoutContainer {
-
+    class ViewHolder(val view: View, adapter: FlexibleAdapter<*>) : FlexibleViewHolder(view, adapter), LayoutContainer {
         override val containerView: View
             get() = contentView
     }

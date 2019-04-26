@@ -10,33 +10,39 @@ import java.io.Serializable
 @Entity(tableName = "Timetable")
 data class Timetable(
 
-        @ColumnInfo(name = "student_id")
-        var studentId: Int,
+    @ColumnInfo(name = "student_id")
+    val studentId: Int,
 
-        @ColumnInfo(name = "diary_id")
-        var diaryId: Int,
+    @ColumnInfo(name = "diary_id")
+    val diaryId: Int,
 
-        val number: Int = 0,
+    val number: Int,
 
-        val start: LocalDateTime = LocalDateTime.now(),
+    val start: LocalDateTime,
 
-        val end: LocalDateTime = LocalDateTime.now(),
+    val end: LocalDateTime,
 
-        val date: LocalDate,
+    val date: LocalDate,
 
-        val subject: String,
+    val subject: String,
 
-        val group: String,
+    val subjectOld: String,
 
-        val room: String,
+    val group: String,
 
-        val teacher: String,
+    val room: String,
 
-        val info: String,
+    val roomOld: String,
 
-        val changes: Boolean = false,
+    val teacher: String,
 
-        val canceled: Boolean = false
+    val teacherOld: String,
+
+    val info: String,
+
+    val changes: Boolean,
+
+    val canceled: Boolean
 ) : Serializable {
 
     @PrimaryKey(autoGenerate = true)

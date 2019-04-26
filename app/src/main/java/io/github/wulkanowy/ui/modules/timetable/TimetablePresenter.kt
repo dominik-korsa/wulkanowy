@@ -2,9 +2,9 @@ package io.github.wulkanowy.ui.modules.timetable
 
 import com.google.firebase.analytics.FirebaseAnalytics.Param.START_DATE
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
-import io.github.wulkanowy.data.repositories.SemesterRepository
-import io.github.wulkanowy.data.repositories.StudentRepository
-import io.github.wulkanowy.data.repositories.TimetableRepository
+import io.github.wulkanowy.data.repositories.semester.SemesterRepository
+import io.github.wulkanowy.data.repositories.student.StudentRepository
+import io.github.wulkanowy.data.repositories.timetable.TimetableRepository
 import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
 import io.github.wulkanowy.ui.base.session.SessionErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
@@ -57,12 +57,16 @@ class TimetablePresenter @Inject constructor(
     }
 
     fun onViewReselected() {
-        Timber.i("Exam view is reselected")
-        now().nextOrSameSchoolDay.also {
-            if (currentDate != it) {
-                loadData(it)
-                reloadView()
-            } else if (view?.isViewEmpty == false) view?.resetView()
+        Timber.i("Timetable view is reselected")
+        view?.also { view ->
+            if (view.currentStackSize == 1) {
+                now().nextOrSameSchoolDay.also {
+                    if (currentDate != it) {
+                        loadData(it)
+                        reloadView()
+                    } else if (!view.isViewEmpty) view.resetView()
+                }
+            } else view.popView()
         }
     }
 
@@ -71,6 +75,11 @@ class TimetablePresenter @Inject constructor(
             Timber.i("Select exam item ${item.lesson.id}")
             view?.showTimetableDialog(item.lesson)
         }
+    }
+
+    fun onCompletedLessonsSwitchSelected(): Boolean {
+        view?.openCompletedLessonsView()
+        return true
     }
 
     private fun loadData(date: LocalDate, forceRefresh: Boolean = false) {
@@ -95,6 +104,7 @@ class TimetablePresenter @Inject constructor(
                     view?.run {
                         hideRefresh()
                         showProgress(false)
+                        enableSwipe(true)
                     }
                 }
                 .subscribe({
@@ -104,7 +114,7 @@ class TimetablePresenter @Inject constructor(
                         showEmpty(it.isEmpty())
                         showContent(it.isNotEmpty())
                     }
-                    analytics.logEvent("load_timetable", mapOf("items" to it.size, "force_refresh" to forceRefresh, START_DATE to currentDate.toFormattedString("yyyy-MM-dd")))
+                    analytics.logEvent("load_timetable", "items" to it.size, "force_refresh" to forceRefresh, START_DATE to currentDate.toFormattedString("yyyy-MM-dd"))
                 }) {
                     Timber.i("Loading timetable result: An exception occurred")
                     view?.run { showEmpty(isViewEmpty) }
@@ -117,12 +127,13 @@ class TimetablePresenter @Inject constructor(
         Timber.i("Reload timetable view with the date ${currentDate.toFormattedString()}")
         view?.apply {
             showProgress(true)
+            enableSwipe(false)
             showContent(false)
             showEmpty(false)
             clearData()
             showNextButton(!currentDate.plusDays(1).isHolidays)
             showPreButton(!currentDate.minusDays(1).isHolidays)
-            updateNavigationDay(currentDate.toFormattedString("EEEE \n dd.MM.YYYY").capitalize())
+            updateNavigationDay(currentDate.toFormattedString("EEEE\ndd.MM.YYYY").capitalize())
         }
     }
 }

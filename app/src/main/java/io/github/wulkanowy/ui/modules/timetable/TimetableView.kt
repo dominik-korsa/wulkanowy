@@ -9,6 +9,8 @@ interface TimetableView : BaseSessionView {
 
     val isViewEmpty: Boolean
 
+    val currentStackSize: Int?
+
     fun initView()
 
     fun updateData(data: List<TimetableItem>)
@@ -25,6 +27,8 @@ interface TimetableView : BaseSessionView {
 
     fun showProgress(show: Boolean)
 
+    fun enableSwipe(enable: Boolean)
+
     fun showContent(show: Boolean)
 
     fun showPreButton(show: Boolean)
@@ -32,4 +36,8 @@ interface TimetableView : BaseSessionView {
     fun showNextButton(show: Boolean)
 
     fun showTimetableDialog(lesson: Timetable)
+
+    fun popView()
+
+    fun openCompletedLessonsView()
 }

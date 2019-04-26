@@ -3,10 +3,9 @@ package io.github.wulkanowy.ui.modules.settings
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
 import com.takisoft.preferencex.PreferenceFragmentCompat
 import dagger.android.support.AndroidSupportInjection
-import io.github.wulkanowy.BuildConfig
+import io.github.wulkanowy.BuildConfig.DEBUG
 import io.github.wulkanowy.R
 import io.github.wulkanowy.ui.base.BaseActivity
 import io.github.wulkanowy.ui.modules.main.MainView
@@ -37,15 +36,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.scheme_preferences)
-        findPreference(getString(R.string.pref_key_debug_chucker_notification)).isVisible = BuildConfig.DEBUG
+        findPreference(getString(R.string.pref_key_notification_debug)).isVisible = DEBUG
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         presenter.onSharedPreferenceChanged(key)
     }
 
-    override fun setTheme(theme: Int) {
-        AppCompatDelegate.setDefaultNightMode(theme)
+    override fun recreateView() {
         activity?.recreate()
     }
 
