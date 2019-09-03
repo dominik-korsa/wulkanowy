@@ -10,14 +10,15 @@ import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import io.github.wulkanowy.R
 import io.github.wulkanowy.data.db.entities.Homework
-import io.github.wulkanowy.ui.base.session.BaseSessionFragment
+import io.github.wulkanowy.ui.base.BaseFragment
 import io.github.wulkanowy.ui.modules.main.MainActivity
 import io.github.wulkanowy.ui.modules.main.MainView
+import io.github.wulkanowy.utils.dpToPx
 import io.github.wulkanowy.utils.setOnItemClickListener
 import kotlinx.android.synthetic.main.fragment_homework.*
 import javax.inject.Inject
 
-class HomeworkFragment : BaseSessionFragment(), HomeworkView, MainView.TitledView {
+class HomeworkFragment : BaseFragment(), HomeworkView, MainView.TitledView {
 
     @Inject
     lateinit var presenter: HomeworkPresenter
@@ -31,8 +32,7 @@ class HomeworkFragment : BaseSessionFragment(), HomeworkView, MainView.TitledVie
         fun newInstance() = HomeworkFragment()
     }
 
-    override val titleStringId: Int
-        get() = R.string.homework_title
+    override val titleStringId get() = R.string.homework_title
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_homework, container, false)
@@ -45,21 +45,21 @@ class HomeworkFragment : BaseSessionFragment(), HomeworkView, MainView.TitledVie
     }
 
     override fun initView() {
-        homeworkAdapter.run {
-            setOnItemClickListener { presenter.onHomeworkItemSelected(it) }
-        }
+        homeworkAdapter.setOnItemClickListener(presenter::onHomeworkItemSelected)
 
-        homeworkRecycler.run {
+        with(homeworkRecycler) {
             layoutManager = SmoothScrollLinearLayoutManager(context)
             adapter = homeworkAdapter
             addItemDecoration(FlexibleItemDecoration(context)
                 .withDefaultDivider()
-                .withDrawDividerOnLastItem(false)
-            )
+                .withDrawDividerOnLastItem(false))
         }
-        homeworkSwipe.setOnRefreshListener { presenter.onSwipeRefresh() }
+
+        homeworkSwipe.setOnRefreshListener(presenter::onSwipeRefresh)
         homeworkPreviousButton.setOnClickListener { presenter.onPreviousDay() }
         homeworkNextButton.setOnClickListener { presenter.onNextDay() }
+
+        homeworkNavContainer.setElevationCompat(requireContext().dpToPx(8f))
     }
 
     override fun updateData(data: List<HomeworkItem>) {
@@ -110,7 +110,7 @@ class HomeworkFragment : BaseSessionFragment(), HomeworkView, MainView.TitledVie
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putLong(HomeworkFragment.SAVED_DATE_KEY, presenter.currentDate.toEpochDay())
+        outState.putLong(SAVED_DATE_KEY, presenter.currentDate.toEpochDay())
     }
 
     override fun onDestroyView() {

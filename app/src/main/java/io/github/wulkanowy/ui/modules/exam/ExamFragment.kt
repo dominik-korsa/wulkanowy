@@ -13,14 +13,15 @@ import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import io.github.wulkanowy.R
 import io.github.wulkanowy.data.db.entities.Exam
-import io.github.wulkanowy.ui.base.session.BaseSessionFragment
+import io.github.wulkanowy.ui.base.BaseFragment
 import io.github.wulkanowy.ui.modules.main.MainActivity
 import io.github.wulkanowy.ui.modules.main.MainView
+import io.github.wulkanowy.utils.dpToPx
 import io.github.wulkanowy.utils.setOnItemClickListener
 import kotlinx.android.synthetic.main.fragment_exam.*
 import javax.inject.Inject
 
-class ExamFragment : BaseSessionFragment(), ExamView, MainView.MainChildView, MainView.TitledView {
+class ExamFragment : BaseFragment(), ExamView, MainView.MainChildView, MainView.TitledView {
 
     @Inject
     lateinit var presenter: ExamPresenter
@@ -34,11 +35,9 @@ class ExamFragment : BaseSessionFragment(), ExamView, MainView.MainChildView, Ma
         fun newInstance() = ExamFragment()
     }
 
-    override val titleStringId: Int
-        get() = R.string.exam_title
+    override val titleStringId get() = R.string.exam_title
 
-    override val isViewEmpty: Boolean
-        get() = examAdapter.isEmpty
+    override val isViewEmpty get() = examAdapter.isEmpty
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_exam, container, false)
@@ -51,20 +50,21 @@ class ExamFragment : BaseSessionFragment(), ExamView, MainView.MainChildView, Ma
     }
 
     override fun initView() {
-        examAdapter.run {
-            setOnItemClickListener { presenter.onExamItemSelected(it) }
-        }
-        examRecycler.run {
+        examAdapter.setOnItemClickListener(presenter::onExamItemSelected)
+
+        with(examRecycler) {
             layoutManager = SmoothScrollLinearLayoutManager(context)
             adapter = examAdapter
             addItemDecoration(FlexibleItemDecoration(context)
                 .withDefaultDivider(R.layout.item_exam)
-                .withDrawDividerOnLastItem(false)
-            )
+                .withDrawDividerOnLastItem(false))
         }
-        examSwipe.setOnRefreshListener { presenter.onSwipeRefresh() }
+
+        examSwipe.setOnRefreshListener(presenter::onSwipeRefresh)
         examPreviousButton.setOnClickListener { presenter.onPreviousWeek() }
         examNextButton.setOnClickListener { presenter.onNextWeek() }
+
+        examNavContainer.setElevationCompat(requireContext().dpToPx(8f))
     }
 
     override fun hideRefresh() {
@@ -88,7 +88,7 @@ class ExamFragment : BaseSessionFragment(), ExamView, MainView.MainChildView, Ma
     }
 
     override fun onFragmentReselected() {
-        presenter.onViewReselected()
+        if (::presenter.isInitialized) presenter.onViewReselected()
     }
 
     override fun showEmpty(show: Boolean) {

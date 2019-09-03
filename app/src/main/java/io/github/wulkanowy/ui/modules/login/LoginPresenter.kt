@@ -1,12 +1,18 @@
 package io.github.wulkanowy.ui.modules.login
 
 import io.github.wulkanowy.data.db.entities.Student
+import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.ui.base.BasePresenter
 import io.github.wulkanowy.ui.base.ErrorHandler
+import io.github.wulkanowy.utils.SchedulersProvider
 import timber.log.Timber
 import javax.inject.Inject
 
-class LoginPresenter @Inject constructor(errorHandler: ErrorHandler) : BasePresenter<LoginView>(errorHandler) {
+class LoginPresenter @Inject constructor(
+    schedulers: SchedulersProvider,
+    errorHandler: ErrorHandler,
+    studentRepository: StudentRepository
+) : BasePresenter<LoginView>(errorHandler, studentRepository, schedulers) {
 
     override fun onAttachView(view: LoginView) {
         super.onAttachView(view)
@@ -14,7 +20,7 @@ class LoginPresenter @Inject constructor(errorHandler: ErrorHandler) : BasePrese
             initAdapter()
             showActionBar(false)
         }
-        Timber.i("Login view is attached")
+        Timber.i("Login view was initialized")
     }
 
     fun onFormViewAccountLogged(students: List<Student>, loginData: Triple<String, String, String>) {

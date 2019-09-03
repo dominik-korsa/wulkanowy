@@ -1,7 +1,7 @@
 package io.github.wulkanowy.ui.modules.timetablewidget
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
-import io.github.wulkanowy.data.db.SharedPrefHelper
+import io.github.wulkanowy.data.db.SharedPrefProvider
 import io.github.wulkanowy.data.db.entities.Student
 import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.ui.base.BasePresenter
@@ -11,11 +11,11 @@ import io.github.wulkanowy.utils.SchedulersProvider
 import javax.inject.Inject
 
 class TimetableWidgetConfigurePresenter @Inject constructor(
-    private val errorHandler: ErrorHandler,
-    private val schedulers: SchedulersProvider,
-    private val studentRepository: StudentRepository,
-    private val sharedPref: SharedPrefHelper
-) : BasePresenter<TimetableWidgetConfigureView>(errorHandler) {
+    schedulers: SchedulersProvider,
+    errorHandler: ErrorHandler,
+    studentRepository: StudentRepository,
+    private val sharedPref: SharedPrefProvider
+) : BasePresenter<TimetableWidgetConfigureView>(errorHandler, studentRepository, schedulers) {
 
     private var appWidgetId: Int? = null
 

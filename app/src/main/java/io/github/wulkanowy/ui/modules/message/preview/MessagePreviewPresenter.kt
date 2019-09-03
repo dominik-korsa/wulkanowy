@@ -1,11 +1,10 @@
 package io.github.wulkanowy.ui.modules.message.preview
 
-import com.google.firebase.analytics.FirebaseAnalytics.Param.START_DATE
 import io.github.wulkanowy.data.db.entities.Message
 import io.github.wulkanowy.data.repositories.message.MessageRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
-import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
-import io.github.wulkanowy.ui.base.session.SessionErrorHandler
+import io.github.wulkanowy.ui.base.BasePresenter
+import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
 import io.github.wulkanowy.utils.SchedulersProvider
 import io.github.wulkanowy.utils.toFormattedString
@@ -13,23 +12,23 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class MessagePreviewPresenter @Inject constructor(
-    private val errorHandler: SessionErrorHandler,
-    private val schedulers: SchedulersProvider,
+    schedulers: SchedulersProvider,
+    errorHandler: ErrorHandler,
+    studentRepository: StudentRepository,
     private val messageRepository: MessageRepository,
-    private val studentRepository: StudentRepository,
     private val analytics: FirebaseAnalyticsHelper
-) : BaseSessionPresenter<MessagePreviewView>(errorHandler) {
+) : BasePresenter<MessagePreviewView>(errorHandler, studentRepository, schedulers) {
 
-    var messageId: Int = 0
+    var messageId = 0L
 
     private var message: Message? = null
 
-    fun onAttachView(view: MessagePreviewView, id: Int) {
+    fun onAttachView(view: MessagePreviewView, id: Long) {
         super.onAttachView(view)
         loadData(id)
     }
 
-    private fun loadData(id: Int) {
+    private fun loadData(id: Long) {
         Timber.i("Loading message $id preview started")
         messageId = id
         disposable.apply {
@@ -53,7 +52,7 @@ class MessagePreviewPresenter @Inject constructor(
                             else setSender(it.sender)
                         }
                     }
-                    analytics.logEvent("load_message_preview", START_DATE to message.date.toFormattedString("yyyy.MM.dd"), "length" to message.content?.length)
+                    analytics.logEvent("load_message_preview", "length" to message.content?.length)
                 }) {
                     Timber.i("Loading message $id preview result: An exception occurred ")
                     view?.showMessageError()

@@ -11,16 +11,16 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class AccountPresenter @Inject constructor(
-    private val errorHandler: ErrorHandler,
-    private val studentRepository: StudentRepository,
-    private val syncManager: SyncManager,
-    private val schedulers: SchedulersProvider
-) : BasePresenter<AccountView>(errorHandler) {
+    schedulers: SchedulersProvider,
+    errorHandler: ErrorHandler,
+    studentRepository: StudentRepository,
+    private val syncManager: SyncManager
+) : BasePresenter<AccountView>(errorHandler, studentRepository, schedulers) {
 
     override fun onAttachView(view: AccountView) {
         super.onAttachView(view)
-        Timber.i("Account dialog is attached")
         view.initView()
+        Timber.i("Account dialog view was initialized")
         loadData()
     }
 
@@ -54,7 +54,7 @@ class AccountPresenter @Inject constructor(
                         openClearLoginView()
                     } else {
                         Timber.i("Logout result: Switch to another student")
-                        recreateView()
+                        recreateMainView()
                     }
                 }
             }, {
@@ -73,9 +73,10 @@ class AccountPresenter @Inject constructor(
                 disposable.add(studentRepository.switchStudent(item.student)
                     .subscribeOn(schedulers.backgroundThread)
                     .observeOn(schedulers.mainThread)
+                    .doFinally { view?.dismissView() }
                     .subscribe({
                         Timber.i("Change a student result: Success")
-                        view?.recreateView()
+                        view?.recreateMainView()
                     }, {
                         Timber.i("Change a student result: An exception occurred")
                         errorHandler.dispatch(it)

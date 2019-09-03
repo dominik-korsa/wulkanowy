@@ -35,7 +35,7 @@ class SyncWorker @AssistedInject constructor(
 
     override fun createWork(): Single<Result> {
         Timber.i("SyncWorker is starting")
-        return studentRepository.isStudentSaved()
+        return studentRepository.isCurrentStudentSet()
             .filter { true }
             .flatMap { studentRepository.getCurrentStudent().toMaybe() }
             .flatMapCompletable { student ->
@@ -64,7 +64,7 @@ class SyncWorker @AssistedInject constructor(
     private fun notify(result: Result) {
         notificationManager.notify(Random.nextInt(Int.MAX_VALUE), NotificationCompat.Builder(applicationContext, DebugChannel.CHANNEL_ID)
             .setContentTitle("Debug notification")
-            .setSmallIcon(R.drawable.ic_more_settings_24dp)
+            .setSmallIcon(R.drawable.ic_more_settings)
             .setAutoCancel(true)
             .setColor(applicationContext.getCompatColor(R.color.colorPrimary))
             .setStyle(BigTextStyle().bigText("${SyncWorker::class.java.simpleName} result: $result"))

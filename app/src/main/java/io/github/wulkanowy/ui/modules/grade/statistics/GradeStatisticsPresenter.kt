@@ -6,23 +6,23 @@ import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
 import io.github.wulkanowy.data.repositories.semester.SemesterRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.data.repositories.subject.SubjectRepository
-import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
-import io.github.wulkanowy.ui.base.session.SessionErrorHandler
+import io.github.wulkanowy.ui.base.BasePresenter
+import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
 import io.github.wulkanowy.utils.SchedulersProvider
 import timber.log.Timber
 import javax.inject.Inject
 
 class GradeStatisticsPresenter @Inject constructor(
-    private val errorHandler: SessionErrorHandler,
+    schedulers: SchedulersProvider,
+    errorHandler: ErrorHandler,
+    studentRepository: StudentRepository,
     private val gradeStatisticsRepository: GradeStatisticsRepository,
     private val subjectRepository: SubjectRepository,
-    private val studentRepository: StudentRepository,
     private val semesterRepository: SemesterRepository,
     private val preferencesRepository: PreferencesRepository,
-    private val schedulers: SchedulersProvider,
     private val analytics: FirebaseAnalyticsHelper
-) : BaseSessionPresenter<GradeStatisticsView>(errorHandler) {
+) : BasePresenter<GradeStatisticsView>(errorHandler, studentRepository, schedulers) {
 
     private var subjects = emptyList<Subject>()
 
@@ -62,7 +62,7 @@ class GradeStatisticsPresenter @Inject constructor(
         view?.notifyParentRefresh()
     }
 
-    fun onSubjectSelected(name: String) {
+    fun onSubjectSelected(name: String?) {
         Timber.i("Select grade stats subject $name")
         view?.run {
             showContent(false)
@@ -71,8 +71,8 @@ class GradeStatisticsPresenter @Inject constructor(
             showEmpty(false)
             clearView()
         }
-        (subjects.singleOrNull { it.name == name }?.name).let {
-            if (it != currentSubjectName) loadData(currentSemesterId, name, currentIsSemester)
+        (subjects.singleOrNull { it.name == name }?.name)?.let {
+            if (it != currentSubjectName) loadData(currentSemesterId, it, currentIsSemester)
         }
     }
 

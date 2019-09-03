@@ -1,11 +1,6 @@
-Wersja 0.7.5
+Wersja 0.9.4
 
-Uwaga! Jeżeli w aplikacji przestały wyświetlać się oceny, prosimy o wylogowanie i zalogowanie się ponownie!
+- naprawienie nawigacji we frekwencji, sprawdzianach, planie lekcji na wakacjach
+- wyświetlanie szczęśliwego numerka po ostatniej aktualizacji dziennika VULCAN (19.06)
 
-Naprawiliśmy:
-- problem z brakiem aktywnego semestru
-- logowanie w niestandardowych dziennikach na vulcan.net.pl
-- oznaczanie lekcji w planie jako odwołanej, jeśli brak opisu tej zmiany
-- ładowanie wiadomości, jeśli byli zalogowani jednocześnie uczeń i rodzic
-
-Pełna lista zmian: https://github.com/wulkanowy/wulkanowy/releases/tag/0.7.5
+Pełna lista zmian: https://github.com/wulkanowy/wulkanowy/releases

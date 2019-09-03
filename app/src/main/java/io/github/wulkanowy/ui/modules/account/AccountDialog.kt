@@ -1,7 +1,5 @@
 package io.github.wulkanowy.ui.modules.account
 
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +12,8 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import io.github.wulkanowy.R
+import io.github.wulkanowy.ui.base.BaseActivity
 import io.github.wulkanowy.ui.modules.login.LoginActivity
-import io.github.wulkanowy.ui.modules.main.MainActivity
 import io.github.wulkanowy.utils.setOnItemClickListener
 import kotlinx.android.synthetic.main.dialog_account.*
 import javax.inject.Inject
@@ -74,16 +72,17 @@ class AccountDialog : DaggerAppCompatDialogFragment(), AccountView {
     }
 
     override fun openLoginView() {
-        activity?.also {
+        activity?.let {
             startActivity(LoginActivity.getStartIntent(it))
         }
     }
 
+    override fun showExpiredDialog() {
+        (activity as? BaseActivity<*>)?.showExpiredDialog()
+    }
+
     override fun openClearLoginView() {
-        activity?.also {
-            startActivity(LoginActivity.getStartIntent(it)
-                .apply { addFlags(FLAG_ACTIVITY_CLEAR_TASK or FLAG_ACTIVITY_NEW_TASK) })
-        }
+        (activity as? BaseActivity<*>)?.openClearLoginView()
     }
 
     override fun showConfirmDialog() {
@@ -97,11 +96,8 @@ class AccountDialog : DaggerAppCompatDialogFragment(), AccountView {
         }
     }
 
-    override fun recreateView() {
-        activity?.also {
-            startActivity(MainActivity.getStartIntent(it))
-            it.finish()
-        }
+    override fun recreateMainView() {
+        activity?.recreate()
     }
 
     override fun onDestroy() {

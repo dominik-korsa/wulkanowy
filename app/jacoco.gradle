@@ -1,7 +1,7 @@
 apply plugin: "jacoco"
 
 jacoco {
-    toolVersion "0.8.3"
+    toolVersion "0.8.4"
     reportsDir = file("$buildDir/reports")
 }
 
@@ -31,17 +31,20 @@ task jacocoTestReport(type: JacocoReport) {
                     '**/*_Provide*Factory*.*',
                     '**/*_Factory.*']
 
-    classDirectories = fileTree(
+    classDirectories.setFrom(fileTree(
             dir: "$buildDir/intermediates/classes/debug",
             excludes: excludes
     ) + fileTree(
-            dir: "$buildDir/tmp/kotlin-classes/debug",
+            dir: "$buildDir/tmp/kotlin-classes/playDebug",
             excludes: excludes
-    )
+    ))
 
-    sourceDirectories = files("$project.projectDir/src/main/java")
-    executionData = fileTree(
+    sourceDirectories.setFrom(files([
+            "src/main/java",
+            "src/play/java"
+    ]))
+    executionData.setFrom(fileTree(
             dir: project.projectDir,
             includes: ["**/*.exec", "**/*.ec"]
-    )
+    ))
 }

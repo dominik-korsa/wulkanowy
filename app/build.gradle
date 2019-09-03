@@ -6,6 +6,7 @@ apply plugin: 'io.fabric'
 apply plugin: 'com.github.triplet.play'
 apply from: 'jacoco.gradle'
 apply from: 'sonarqube.gradle'
+apply from: 'hooks.gradle'
 
 android {
     compileSdkVersion 28
@@ -14,10 +15,10 @@ android {
     defaultConfig {
         applicationId "io.github.wulkanowy"
         testApplicationId "io.github.tests.wulkanowy"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 28
-        versionCode 32
-        versionName "0.7.6"
+        versionCode 42
+        versionName "0.9.4"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -27,7 +28,8 @@ android {
         ]
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString(),
+                             "room.incremental"   : "true"]
             }
         }
     }
@@ -63,6 +65,19 @@ android {
         }
     }
 
+    flavorDimensions "platform"
+
+    productFlavors {
+        play {
+            dimension "platform"
+        }
+
+        fdroid {
+            buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
+            dimension "platform"
+        }
+    }
+
     lintOptions {
         disable 'HardwareIds'
     }
@@ -70,6 +85,15 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/library_release.kotlin_module'
+        exclude 'META-INF/library-core_release.kotlin_module'
     }
 }
 
@@ -80,75 +104,103 @@ androidExtensions {
 play {
     serviceAccountEmail = System.getenv("PLAY_SERVICE_ACCOUNT_EMAIL") ?: "jan@fakelog.cf"
     serviceAccountCredentials = file('key.p12')
-    defaultToAppBundles = true
+    defaultToAppBundles = false
     track = 'alpha'
 }
 
+ext {
+    work_manager = "2.2.0"
+    room = "2.2.0-beta01"
+    dagger = "2.24"
+    chucker = "2.0.4"
+    mockk = "1.9.2"
+    mockito_core = "3.0.6"
+}
+
+configurations.all {
+    resolutionStrategy.force "androidx.constraintlayout:constraintlayout:1.1.3"
+}
+
 dependencies {
-    implementation 'com.github.wulkanowy:api:3335bd6'
+    implementation "io.github.wulkanowy:api:4b50c79"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "androidx.legacy:legacy-support-v4:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.0.2"
-    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "androidx.core:core-ktx:1.1.0-rc03"
+    implementation "androidx.activity:activity-ktx:1.0.0-rc01"
+    implementation "androidx.appcompat:appcompat:1.1.0-rc01"
+    implementation "androidx.appcompat:appcompat-resources:1.1.0-rc01"
+    implementation "androidx.fragment:fragment-ktx:1.1.0-rc04"
+    implementation "androidx.annotation:annotation:1.1.0"
+    implementation "androidx.multidex:multidex:2.0.1"
 
-    implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation "com.google.android.material:material:1.1.0-alpha05"
-    implementation 'com.github.wulkanowy:MaterialChipsInput:b72fd0ee6f'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation "androidx.preference:preference-ktx:1.1.0-rc01"
+    implementation "androidx.recyclerview:recyclerview:1.1.0-beta03"
+    implementation "androidx.viewpager:viewpager:1.0.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation "androidx.constraintlayout:constraintlayout:1.1.3"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0-beta01"
+    implementation "com.google.android.material:material:1.1.0-alpha07"
+    implementation "com.github.wulkanowy:material-chips-input:2.0.1"
+    implementation "com.github.PhilJay:MPAndroidChart:v3.1.0"
+    implementation "me.zhanghai.android.materialprogressbar:library:1.6.1"
 
-    implementation "androidx.work:work-runtime:2.0.1"
-    implementation "androidx.work:work-rxjava2:2.0.1"
+    implementation "androidx.work:work-runtime-ktx:$work_manager"
+    implementation "androidx.work:work-rxjava2:$work_manager"
+    implementation "androidx.work:work-gcm:$work_manager"
 
-    implementation "androidx.room:room-runtime:2.1.0-alpha06"
-    implementation "androidx.room:room-rxjava2:2.1.0-alpha06"
-    kapt "androidx.room:room-compiler:2.1.0-alpha06"
+    implementation "androidx.room:room-runtime:$room"
+    implementation "androidx.room:room-rxjava2:$room"
+    implementation "androidx.room:room-ktx:$room"
+    kapt "androidx.room:room-compiler:$room"
 
-    implementation "com.google.dagger:dagger-android-support:2.22.1"
-    kapt "com.google.dagger:dagger-compiler:2.22.1"
-    kapt "com.google.dagger:dagger-android-processor:2.22.1"
-    implementation 'com.squareup.inject:assisted-inject-annotations-dagger2:0.4.0'
-    kapt 'com.squareup.inject:assisted-inject-processor-dagger2:0.4.0'
+    implementation "com.google.dagger:dagger-android-support:$dagger"
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+    kapt "com.google.dagger:dagger-android-processor:$dagger"
+    implementation "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.0"
+    kapt "com.squareup.inject:assisted-inject-processor-dagger2:0.5.0"
 
     implementation "eu.davidea:flexible-adapter:5.1.0"
     implementation "eu.davidea:flexible-adapter-ui:1.0.0"
     implementation "com.aurelhubert:ahbottomnavigation:2.3.4"
-    implementation 'com.ncapdevi:frag-nav:3.2.0'
+    implementation "com.ncapdevi:frag-nav:3.3.0"
 
-    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.2'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.8"
+    implementation "com.github.pwittchen:reactivenetwork-rx2:3.0.6"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    implementation "io.reactivex.rxjava2:rxjava:2.2.12"
 
-    implementation 'com.google.code.gson:gson:2.8.5'
-    implementation "com.jakewharton.threetenabp:threetenabp:1.2.0"
+    implementation "com.google.code.gson:gson:2.8.5"
+    implementation "com.jakewharton.threetenabp:threetenabp:1.2.1"
     implementation "com.jakewharton.timber:timber:4.7.1"
     implementation "at.favre.lib:slf4j-timber:1.0.1"
-    implementation "com.squareup.okhttp3:logging-interceptor:3.12.1"
+    implementation "com.squareup.okhttp3:logging-interceptor:3.12.3"
+    implementation "com.mikepenz:aboutlibraries:7.0.2"
 
-    implementation "com.mikepenz:aboutlibraries:6.2.3"
-    implementation 'com.takisoft.preferencex:preferencex:1.0.0'
+    playImplementation "com.google.firebase:firebase-core:17.2.0"
+    playImplementation "com.crashlytics.sdk.android:crashlytics:2.10.1"
 
-    implementation 'com.google.firebase:firebase-core:16.0.8'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
+    releaseImplementation "fr.o80.chucker:library-no-op:$chucker"
 
-    releaseImplementation 'fr.o80.chucker:library-no-op:2.0.4'
-
-    debugImplementation 'fr.o80.chucker:library:2.0.4'
+    debugImplementation "fr.o80.chucker:library:$chucker"
     debugImplementation "com.amitshekhar.android:debug-db:1.0.6"
 
     testImplementation "junit:junit:4.12"
-    testImplementation "io.mockk:mockk:1.9.2"
-    testImplementation "org.mockito:mockito-inline:2.27.0"
-    testImplementation 'org.threeten:threetenbp:1.3.8'
+    testImplementation "io.mockk:mockk:$mockk"
+    testImplementation "org.threeten:threetenbp:1.4.0"
+    testImplementation "org.mockito:mockito-core:$mockito_core"
+    testImplementation("org.mockito:mockito-inline:3.0.6") {
+        exclude group: "org.mockito", module: "mockito-core"
+    }
 
-    androidTestImplementation 'androidx.test:core:1.1.0'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation "io.mockk:mockk-android:1.9.2"
-    androidTestImplementation 'org.mockito:mockito-android:2.27.0'
-    androidTestImplementation "androidx.room:room-testing:2.1.0-alpha06"
+    androidTestImplementation "androidx.test:core:1.2.0"
+    androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.1"
+    androidTestImplementation "io.mockk:mockk-android:$mockk"
+    androidTestImplementation "androidx.room:room-testing:$room"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    androidTestImplementation "org.mockito:mockito-core:$mockito_core"
+    androidTestImplementation("org.mockito:mockito-android:3.0.6") {
+        exclude group: 'org.mockito', module: 'mockito-core'
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'

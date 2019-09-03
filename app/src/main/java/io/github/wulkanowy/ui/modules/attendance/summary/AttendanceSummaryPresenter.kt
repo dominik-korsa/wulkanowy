@@ -6,8 +6,8 @@ import io.github.wulkanowy.data.repositories.attendancesummary.AttendanceSummary
 import io.github.wulkanowy.data.repositories.semester.SemesterRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.data.repositories.subject.SubjectRepository
-import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
-import io.github.wulkanowy.ui.base.session.SessionErrorHandler
+import io.github.wulkanowy.ui.base.BasePresenter
+import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
 import io.github.wulkanowy.utils.SchedulersProvider
 import io.github.wulkanowy.utils.calculatePercentage
@@ -19,14 +19,14 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import javax.inject.Inject
 
 class AttendanceSummaryPresenter @Inject constructor(
-    private val errorHandler: SessionErrorHandler,
+    schedulers: SchedulersProvider,
+    errorHandler: ErrorHandler,
+    studentRepository: StudentRepository,
     private val attendanceSummaryRepository: AttendanceSummaryRepository,
     private val subjectRepository: SubjectRepository,
-    private val studentRepository: StudentRepository,
     private val semesterRepository: SemesterRepository,
-    private val schedulers: SchedulersProvider,
     private val analytics: FirebaseAnalyticsHelper
-) : BaseSessionPresenter<AttendanceSummaryView>(errorHandler) {
+) : BasePresenter<AttendanceSummaryView>(errorHandler, studentRepository, schedulers) {
 
     private var subjects = emptyList<Subject>()
 
@@ -35,8 +35,8 @@ class AttendanceSummaryPresenter @Inject constructor(
 
     fun onAttachView(view: AttendanceSummaryView, subjectId: Int?) {
         super.onAttachView(view)
-        Timber.i("Attendance summary view is attached with subject id ${subjectId ?: -1}")
         view.initView()
+        Timber.i("Attendance summary view was initialized with subject id ${subjectId ?: -1}")
         loadData(subjectId ?: -1)
         loadSubjects()
     }
@@ -46,7 +46,7 @@ class AttendanceSummaryPresenter @Inject constructor(
         loadData(currentSubjectId, true)
     }
 
-    fun onSubjectSelected(name: String) {
+    fun onSubjectSelected(name: String?) {
         Timber.i("Select attendance summary subject $name")
         view?.run {
             showContent(false)

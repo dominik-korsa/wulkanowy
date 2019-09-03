@@ -3,20 +3,20 @@ package io.github.wulkanowy.ui.modules.grade
 import io.github.wulkanowy.data.db.entities.Semester
 import io.github.wulkanowy.data.repositories.semester.SemesterRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
-import io.github.wulkanowy.ui.base.session.BaseSessionPresenter
-import io.github.wulkanowy.ui.base.session.SessionErrorHandler
+import io.github.wulkanowy.ui.base.BasePresenter
+import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
 import io.github.wulkanowy.utils.SchedulersProvider
 import timber.log.Timber
 import javax.inject.Inject
 
 class GradePresenter @Inject constructor(
-    private val errorHandler: SessionErrorHandler,
-    private val schedulers: SchedulersProvider,
-    private val studentRepository: StudentRepository,
+    schedulers: SchedulersProvider,
+    errorHandler: ErrorHandler,
+    studentRepository: StudentRepository,
     private val semesterRepository: SemesterRepository,
     private val analytics: FirebaseAnalyticsHelper
-) : BaseSessionPresenter<GradeView>(errorHandler) {
+) : BasePresenter<GradeView>(errorHandler, studentRepository, schedulers) {
 
     var selectedIndex = 0
         private set
@@ -27,12 +27,12 @@ class GradePresenter @Inject constructor(
 
     fun onAttachView(view: GradeView, savedIndex: Int?) {
         super.onAttachView(view)
-        Timber.i("Grade view is attached")
         selectedIndex = savedIndex ?: 0
         view.run {
             initView()
             enableSwipe(false)
         }
+        Timber.i("Grade view was initialized with $selectedIndex index")
         loadData()
     }
 
