@@ -15,6 +15,8 @@ import io.github.wulkanowy.utils.getThemeAttrColor
 import io.github.wulkanowy.utils.toFormattedString
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_timetable.*
+import org.threeten.bp.Duration
+import org.threeten.bp.LocalDateTime
 
 class TimetableItem(val lesson: Timetable) :
     AbstractFlexibleItem<TimetableItem.ViewHolder>() {
@@ -37,6 +39,7 @@ class TimetableItem(val lesson: Timetable) :
 
         updateDescription(holder)
         updateColors(holder)
+        updateTimeLeft(holder)
     }
 
     private fun updateFields(holder: ViewHolder) {
@@ -47,6 +50,25 @@ class TimetableItem(val lesson: Timetable) :
             timetableItemTeacher.text = lesson.teacher
             timetableItemTimeStart.text = lesson.start.toFormattedString("HH:mm")
             timetableItemTimeFinish.text = lesson.end.toFormattedString("HH:mm")
+        }
+    }
+
+    private fun updateTimeLeft(holder: ViewHolder) {
+        val timeLeft : Duration? =
+            if (lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now())) Duration.between(LocalDateTime.now(), lesson.end)
+            else null
+
+        with(holder) {
+            if (timeLeft == null) {
+                timetableItemTimeLeft.visibility = GONE
+            } else {
+                timetableItemTimeLeft.visibility = VISIBLE
+                timetableItemTimeLeft.text = if (timeLeft.seconds <= 60) {
+                    "${timeLeft.seconds.toString(10)} sek"
+                } else {
+                    "${timeLeft.toMinutes().toString(10)} min"
+                }
+            }
         }
     }
 
