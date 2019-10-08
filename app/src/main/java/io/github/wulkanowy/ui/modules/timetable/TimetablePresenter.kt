@@ -43,6 +43,16 @@ class TimetablePresenter @Inject constructor(
         loadData(ofEpochDay(date ?: baseDate.toEpochDay()))
         if (currentDate.isHolidays) setBaseDateOnHolidays()
         reloadView()
+
+        schedulers.mainThread.schedulePeriodicallyDirect(
+            {
+                Timber.i("Timetable time updated")
+                this.view?.updateTimeLeft()
+            },
+            1000,
+            1000,
+            MILLISECONDS
+        )
     }
 
     fun onPreviousDay() {

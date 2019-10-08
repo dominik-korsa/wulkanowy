@@ -27,6 +27,8 @@ class TimetableItem(val lesson: Timetable) :
         return ViewHolder(view, adapter)
     }
 
+    private var lastTimeLeftShown: Int? = null
+
     @SuppressLint("SetTextI18n")
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder, position: Int, payloads: MutableList<Any>?) {
         updateFields(holder)
@@ -53,10 +55,31 @@ class TimetableItem(val lesson: Timetable) :
         }
     }
 
+    fun getTimeNeedsUpdate(): Boolean {
+        val timeLeft : Duration? =
+            if (lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now())) Duration.between(LocalDateTime.now(), lesson.end)
+            else null
+
+        val displayedSeconds : Int? =  when {
+            timeLeft == null -> null
+            timeLeft.seconds <= 60 -> timeLeft.seconds.toInt()
+            else -> timeLeft.toMinutes().toInt() * 60
+        }
+
+        return displayedSeconds != lastTimeLeftShown
+    }
+
     private fun updateTimeLeft(holder: ViewHolder) {
         val timeLeft : Duration? =
             if (lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now())) Duration.between(LocalDateTime.now(), lesson.end)
             else null
+
+        lastTimeLeftShown = when {
+            timeLeft == null -> null
+            timeLeft.seconds <= 60 -> timeLeft.seconds.toInt()
+            else -> timeLeft.toMinutes().toInt() * 60
+        }
+
 
         with(holder) {
             if (timeLeft == null) {
@@ -64,9 +87,9 @@ class TimetableItem(val lesson: Timetable) :
             } else {
                 timetableItemTimeLeft.visibility = VISIBLE
                 timetableItemTimeLeft.text = if (timeLeft.seconds <= 60) {
-                    "${timeLeft.seconds.toString(10)} sek"
+                    "${timeLeft.seconds.toString(10)} ${view.context.getString(R.string.timetable_seconds)}"
                 } else {
-                    "${timeLeft.toMinutes().toString(10)} min"
+                    "${timeLeft.toMinutes().toString(10)} ${view.context.getString(R.string.timetable_minutes)}"
                 }
             }
         }

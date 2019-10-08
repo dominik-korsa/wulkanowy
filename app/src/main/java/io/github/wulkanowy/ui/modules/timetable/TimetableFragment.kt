@@ -20,6 +20,7 @@ import io.github.wulkanowy.ui.modules.timetable.completed.CompletedLessonsFragme
 import io.github.wulkanowy.utils.dpToPx
 import io.github.wulkanowy.utils.setOnItemClickListener
 import kotlinx.android.synthetic.main.fragment_timetable.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
@@ -149,6 +150,15 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong(SAVED_DATE_KEY, presenter.currentDate.toEpochDay())
+    }
+
+    override fun updateTimeLeft() {
+        for (i in 0 until timetableAdapter.itemCount) {
+            val item = timetableAdapter.getItem(i) as TimetableItem?
+            if (item != null && item.getTimeNeedsUpdate()) {
+                timetableAdapter.updateItem(item)
+            }
+        }
     }
 
     override fun onDestroyView() {

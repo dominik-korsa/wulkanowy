@@ -90,6 +90,8 @@
     <string name="timetable_time">Hours</string>
     <string name="timetable_changes">Changes</string>
     <string name="timetable_no_items">No lessons this day</string>
+    <string name="timetable_minutes">min</string>
+    <string name="timetable_seconds">sec</string>
 
 
     <!--Completed lessons-->
