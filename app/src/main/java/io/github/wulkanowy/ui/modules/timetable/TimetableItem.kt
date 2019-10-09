@@ -57,8 +57,11 @@ class TimetableItem(val lesson: Timetable) :
 
     fun getTimeNeedsUpdate(): Boolean {
         val timeLeft : Duration? =
-            if (lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now())) Duration.between(LocalDateTime.now(), lesson.end)
-            else null
+            when {
+                lesson.canceled -> null
+                lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now()) -> Duration.between(LocalDateTime.now(), lesson.end)
+                else -> null
+            }
 
         val displayedSeconds : Int? =  when {
             timeLeft == null -> null
@@ -71,8 +74,11 @@ class TimetableItem(val lesson: Timetable) :
 
     private fun updateTimeLeft(holder: ViewHolder) {
         val timeLeft : Duration? =
-            if (lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now())) Duration.between(LocalDateTime.now(), lesson.end)
-            else null
+            when {
+                lesson.canceled -> null
+                lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now()) -> Duration.between(LocalDateTime.now(), lesson.end)
+                else -> null
+            }
 
         lastTimeLeftShown = when {
             timeLeft == null -> null
@@ -86,11 +92,13 @@ class TimetableItem(val lesson: Timetable) :
                 timetableItemTimeLeft.visibility = GONE
             } else {
                 timetableItemTimeLeft.visibility = VISIBLE
-                timetableItemTimeLeft.text = if (timeLeft.seconds <= 60) {
-                    "${timeLeft.seconds.toString(10)} ${view.context.getString(R.string.timetable_seconds)}"
-                } else {
-                    "${timeLeft.toMinutes().toString(10)} ${view.context.getString(R.string.timetable_minutes)}"
-                }
+                timetableItemTimeLeft.text = String.format(view.context.getString(R.string.timetable_time_left),
+                    if (timeLeft.seconds <= 60) {
+                        "${timeLeft.seconds.toString(10)} ${view.context.getString(R.string.timetable_seconds)}"
+                    } else {
+                        "${timeLeft.toMinutes().toString(10)} ${view.context.getString(R.string.timetable_minutes)}"
+                    }
+                )
             }
         }
     }

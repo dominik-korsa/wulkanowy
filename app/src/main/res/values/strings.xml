@@ -92,6 +92,7 @@
     <string name="timetable_no_items">No lessons this day</string>
     <string name="timetable_minutes">min</string>
     <string name="timetable_seconds">sec</string>
+    <string name="timetable_time_left">%1$s left</string>
 
 
     <!--Completed lessons-->
