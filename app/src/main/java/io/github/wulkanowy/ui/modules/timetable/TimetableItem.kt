@@ -17,8 +17,9 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_timetable.*
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
+import timber.log.Timber
 
-class TimetableItem(val lesson: Timetable) :
+class TimetableItem(val lesson: Timetable, val previousLessonEnd: LocalDateTime?) :
     AbstractFlexibleItem<TimetableItem.ViewHolder>() {
 
     override fun getLayoutRes() = R.layout.item_timetable
@@ -27,7 +28,7 @@ class TimetableItem(val lesson: Timetable) :
         return ViewHolder(view, adapter)
     }
 
-    private var lastTimeLeftShown: Int? = null
+    private var lastTimeLeftShown: String? = null
 
     @SuppressLint("SetTextI18n")
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder, position: Int, payloads: MutableList<Any>?) {
@@ -56,23 +57,38 @@ class TimetableItem(val lesson: Timetable) :
     }
 
     fun getTimeNeedsUpdate(): Boolean {
-        val timeLeft : Duration? =
+        val justFinished = lesson.end.isBefore(LocalDateTime.now()) && lesson.end.plusSeconds(15).isAfter(LocalDateTime.now())
+        val timeLeft =
             when {
                 lesson.canceled -> null
                 lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now()) -> Duration.between(LocalDateTime.now(), lesson.end)
                 else -> null
             }
 
-        val displayedSeconds : Int? =  when {
+        val timeUntil = Duration.between(LocalDateTime.now(), lesson.start)
+        val showTimeUntil =
+            when {
+                lesson.canceled -> false
+                LocalDateTime.now().isAfter(lesson.start) -> false
+                previousLessonEnd != null && LocalDateTime.now().isBefore(previousLessonEnd) -> false
+                else -> timeUntil <= Duration.ofMinutes(60)
+            }
+
+        val displayedValue : String? =  when {
+            justFinished -> "just finished"
+            showTimeUntil ->
+                if (timeUntil.seconds <= 60) "in ${timeUntil.seconds.toInt()} s"
+                else "in ${timeUntil.toMinutes()} m"
             timeLeft == null -> null
-            timeLeft.seconds <= 60 -> timeLeft.seconds.toInt()
-            else -> timeLeft.toMinutes().toInt() * 60
+            timeLeft.seconds <= 60 -> "left ${timeLeft.seconds.toInt()} s"
+            else -> "left ${timeLeft.toMinutes()} m"
         }
 
-        return displayedSeconds != lastTimeLeftShown
+        return displayedValue != lastTimeLeftShown
     }
 
     private fun updateTimeLeft(holder: ViewHolder) {
+        val justFinished = lesson.end.isBefore(LocalDateTime.now()) && lesson.end.plusSeconds(15).isAfter(LocalDateTime.now())
         val timeLeft : Duration? =
             when {
                 lesson.canceled -> null
@@ -80,25 +96,60 @@ class TimetableItem(val lesson: Timetable) :
                 else -> null
             }
 
+        val timeUntil = Duration.between(LocalDateTime.now(), lesson.start)
+        Timber.i("Started ${LocalDateTime.now().isAfter(lesson.start)}")
+        val showTimeUntil =
+            when {
+                lesson.canceled -> false
+                LocalDateTime.now().isAfter(lesson.start) -> false
+                previousLessonEnd != null && LocalDateTime.now().isBefore(previousLessonEnd) -> false
+                else -> timeUntil <= Duration.ofMinutes(60)
+            }
+
         lastTimeLeftShown = when {
+            justFinished -> "just finished"
+            showTimeUntil ->
+                if (timeUntil.seconds <= 60) "in ${timeUntil.seconds.toInt()} s"
+                else "in ${timeUntil.toMinutes()} m"
             timeLeft == null -> null
-            timeLeft.seconds <= 60 -> timeLeft.seconds.toInt()
-            else -> timeLeft.toMinutes().toInt() * 60
+            timeLeft.seconds <= 60 -> "left ${timeLeft.seconds.toInt()} s"
+            else -> "left ${timeLeft.toMinutes()} m"
         }
 
 
         with(holder) {
-            if (timeLeft == null) {
-                timetableItemTimeLeft.visibility = GONE
-            } else {
-                timetableItemTimeLeft.visibility = VISIBLE
-                timetableItemTimeLeft.text = String.format(view.context.getString(R.string.timetable_time_left),
-                    if (timeLeft.seconds <= 60) {
-                        "${timeLeft.seconds.toString(10)} ${view.context.getString(R.string.timetable_seconds)}"
-                    } else {
-                        "${timeLeft.toMinutes().toString(10)} ${view.context.getString(R.string.timetable_minutes)}"
-                    }
-                )
+            when {
+                justFinished -> {
+                    timetableItemTimeUntil.visibility = GONE
+                    timetableItemTimeLeft.visibility = VISIBLE
+                    timetableItemTimeLeft.text = view.context.getString(R.string.timetable_finished)
+                }
+                showTimeUntil -> {
+                    timetableItemTimeUntil.visibility = VISIBLE
+                    timetableItemTimeLeft.visibility = GONE
+                    timetableItemTimeUntil.text = String.format(view.context.getString(R.string.timetable_time_until),
+                        if (timeUntil.seconds <= 60) {
+                            "${timeUntil.seconds.toString(10)} ${view.context.getString(R.string.timetable_seconds)}"
+                        } else {
+                            "${timeUntil.toMinutes().toString(10)} ${view.context.getString(R.string.timetable_minutes)}"
+                        }
+                    )
+                }
+                timeLeft == null -> {
+                    timetableItemTimeUntil.visibility = GONE
+                    timetableItemTimeLeft.visibility = GONE
+                }
+                else -> {
+                    timetableItemTimeUntil.visibility = GONE
+                    timetableItemTimeLeft.visibility = VISIBLE
+                    timetableItemTimeLeft.text = String.format(view.context.getString(R.string.timetable_time_left),
+                        if (timeLeft.seconds <= 60) {
+                            "${timeLeft.seconds.toString(10)} ${view.context.getString(R.string.timetable_seconds)}"
+                        } else {
+                            "${timeLeft.toMinutes().toString(10)} ${view.context.getString(R.string.timetable_minutes)}"
+                        }
+                    )
+                }
             }
         }
     }

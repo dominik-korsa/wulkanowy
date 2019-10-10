@@ -18,6 +18,7 @@ import io.github.wulkanowy.utils.toFormattedString
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDate.now
 import org.threeten.bp.LocalDate.ofEpochDay
+import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import javax.inject.Inject
@@ -119,7 +120,15 @@ class TimetablePresenter @Inject constructor(
                 .flatMap { semesterRepository.getCurrentSemester(it) }
                 .delay(200, MILLISECONDS)
                 .flatMap { timetableRepository.getTimetable(it, currentDate, currentDate, forceRefresh) }
-                .map { items -> items.map { TimetableItem(it)} }
+                .map {  items ->
+                    var previousLessonEnd: LocalDateTime? = null
+                    items.map { lesson ->
+                        val item = TimetableItem(lesson, previousLessonEnd)
+                        if (!lesson.canceled)
+                            previousLessonEnd = lesson.end
+                       item
+                   }
+                }
                 .map { items -> items.sortedBy { it.lesson.number } }
                 .subscribeOn(schedulers.backgroundThread)
                 .observeOn(schedulers.mainThread)
