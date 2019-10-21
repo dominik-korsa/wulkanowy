@@ -15,6 +15,7 @@ import io.github.wulkanowy.utils.nextOrSameSchoolDay
 import io.github.wulkanowy.utils.nextSchoolDay
 import io.github.wulkanowy.utils.previousSchoolDay
 import io.github.wulkanowy.utils.toFormattedString
+import io.reactivex.disposables.Disposable
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDate.now
 import org.threeten.bp.LocalDate.ofEpochDay
@@ -37,6 +38,8 @@ class TimetablePresenter @Inject constructor(
     lateinit var currentDate: LocalDate
         private set
 
+    private var timeLeftDisposable: Disposable? = null
+
     fun onAttachView(view: TimetableView, date: Long?) {
         super.onAttachView(view)
         view.initView()
@@ -44,16 +47,25 @@ class TimetablePresenter @Inject constructor(
         loadData(ofEpochDay(date ?: baseDate.toEpochDay()))
         if (currentDate.isHolidays) setBaseDateOnHolidays()
         reloadView()
+        startTimeLeftSchedule()
+    }
 
-        schedulers.mainThread.schedulePeriodicallyDirect(
+    private fun startTimeLeftSchedule() {
+        if (timeLeftDisposable?.isDisposed == false) return
+        timeLeftDisposable = schedulers.mainThread.schedulePeriodicallyDirect(
             {
                 Timber.i("Timetable time updated")
                 this.view?.updateTimeLeft()
             },
-            1000,
+            (1000 - LocalDateTime.now().nano / 1000000 + 50).toLong(),
             1000,
             MILLISECONDS
         )
+    }
+
+    override fun onDetachView() {
+        super.onDetachView()
+        timeLeftDisposable?.dispose()
     }
 
     fun onPreviousDay() {
@@ -81,7 +93,9 @@ class TimetablePresenter @Inject constructor(
                         reloadView()
                     } else if (!view.isViewEmpty) view.resetView()
                 }
-            } else view.popView()
+            } else {
+                view.popView()
+            }
         }
     }
 
