@@ -15,7 +15,6 @@ import io.github.wulkanowy.utils.getThemeAttrColor
 import io.github.wulkanowy.utils.toFormattedString
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_timetable.*
-import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 
@@ -56,49 +55,14 @@ class TimetableItem(val lesson: Timetable, private val previousLessonEnd: LocalD
         }
     }
 
-    private class DisplayState(lesson: Timetable, previousLessonEnd: LocalDateTime?) {
-        val justFinished : Boolean = lesson.end.isBefore(LocalDateTime.now()) && lesson.end.plusSeconds(15).isAfter(LocalDateTime.now()) && !lesson.canceled
-
-        val timeLeft : Duration? = when {
-            lesson.canceled -> null
-            lesson.end.isAfter(LocalDateTime.now()) && lesson.start.isBefore(LocalDateTime.now()) -> Duration.between(LocalDateTime.now(), lesson.end)
-            else -> null
-        }
-
-        val timeUntil : Duration = Duration.between(LocalDateTime.now(), lesson.start)
-
-        val showTimeUntil : Boolean
-
-        val code : String?
-
-        init {
-            showTimeUntil =
-                when {
-                    lesson.canceled -> false
-                    LocalDateTime.now().isAfter(lesson.start) -> false
-                    previousLessonEnd != null && LocalDateTime.now().isBefore(previousLessonEnd) -> false
-                    else -> timeUntil <= Duration.ofMinutes(60)
-                }
-            code = when {
-                justFinished -> "just finished"
-                showTimeUntil ->
-                    if (timeUntil.seconds <= 60) "in ${timeUntil.seconds.toInt()} s"
-                    else "in ${timeUntil.toMinutes()} m"
-                timeLeft == null -> null
-                timeLeft.seconds <= 60 -> "left ${timeLeft.seconds.toInt()} s"
-                else -> "left ${timeLeft.toMinutes()} m"
-            }
-        }
-    }
-
     fun getTimeNeedsUpdate(): Boolean {
-        return DisplayState(lesson, previousLessonEnd).code != lastTimeLeftShownCode
+        return TimetableItemDisplayState(lesson, previousLessonEnd).code != lastTimeLeftShownCode
     }
 
     private fun updateTimeLeft(holder: ViewHolder) {
         Timber.i("Started ${LocalDateTime.now().isAfter(lesson.start)}")
 
-        val displayState = DisplayState(lesson, previousLessonEnd)
+        val displayState = TimetableItemDisplayState(lesson, previousLessonEnd)
 
         lastTimeLeftShownCode = displayState.code
 
