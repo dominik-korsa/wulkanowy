@@ -89,7 +89,6 @@ class TimetableItem(val lesson: Timetable, private val previousLessonEnd: LocalD
                 else -> "left ${timeLeft.toMinutes()} m"
             }
         }
-
     }
 
     fun getTimeNeedsUpdate(): Boolean {
