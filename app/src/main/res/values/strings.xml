@@ -96,8 +96,8 @@
     <string name="timetable_time">Hours</string>
     <string name="timetable_changes">Changes</string>
     <string name="timetable_no_items">No lessons this day</string>
-    <string name="timetable_minutes">min</string>
-    <string name="timetable_seconds">sec</string>
+    <string name="timetable_minutes">%s min</string>
+    <string name="timetable_seconds">%s sec</string>
     <string name="timetable_time_left">%1$s left</string>
     <string name="timetable_time_until">in %1$s</string>
     <string name="timetable_finished">Finished</string>

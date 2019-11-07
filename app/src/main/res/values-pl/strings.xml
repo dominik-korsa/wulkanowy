@@ -99,8 +99,8 @@
     <string name="timetable_time">Godziny</string>
     <string name="timetable_changes">Zmiany</string>
     <string name="timetable_no_items">Brak lekcji w tym dniu</string>
-    <string name="timetable_minutes">min</string>
-    <string name="timetable_seconds">sek</string>
+    <string name="timetable_minutes">$s min</string>
+    <string name="timetable_seconds">$s sek</string>
     <string name="timetable_time_left">jeszcze %1$s</string>
     <string name="timetable_time_until">za %1$s</string>
     <string name="timetable_finished">Zakończona</string>
