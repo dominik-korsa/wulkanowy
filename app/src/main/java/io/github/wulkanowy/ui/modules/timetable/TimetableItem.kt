@@ -57,7 +57,7 @@ class TimetableItem(val lesson: Timetable, val previousLessonEnd: LocalDateTime?
     }
 
     fun getTimeNeedsUpdate(): Boolean {
-        val justFinished = lesson.end.isBefore(LocalDateTime.now()) && lesson.end.plusSeconds(15).isAfter(LocalDateTime.now())
+        val justFinished = lesson.end.isBefore(LocalDateTime.now()) && lesson.end.plusSeconds(15).isAfter(LocalDateTime.now()) && !lesson.canceled
         val timeLeft =
             when {
                 lesson.canceled -> null
@@ -88,7 +88,7 @@ class TimetableItem(val lesson: Timetable, val previousLessonEnd: LocalDateTime?
     }
 
     private fun updateTimeLeft(holder: ViewHolder) {
-        val justFinished = lesson.end.isBefore(LocalDateTime.now()) && lesson.end.plusSeconds(15).isAfter(LocalDateTime.now())
+        val justFinished = lesson.end.isBefore(LocalDateTime.now()) && lesson.end.plusSeconds(15).isAfter(LocalDateTime.now()) && !lesson.canceled
         val timeLeft : Duration? =
             when {
                 lesson.canceled -> null
