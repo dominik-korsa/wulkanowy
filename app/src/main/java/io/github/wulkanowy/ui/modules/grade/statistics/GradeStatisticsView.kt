@@ -10,6 +10,8 @@ interface GradeStatisticsView : BaseView {
 
     val isBarViewEmpty: Boolean
 
+    val currentType: ViewType
+
     fun initView()
 
     fun updateSubjects(data: ArrayList<String>)
@@ -31,6 +33,10 @@ interface GradeStatisticsView : BaseView {
     fun showBarContent(show: Boolean)
 
     fun showEmpty(show: Boolean)
+
+    fun showErrorView(show: Boolean)
+
+    fun setErrorDetails(message: String)
 
     fun showProgress(show: Boolean)
 

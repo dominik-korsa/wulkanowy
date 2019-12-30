@@ -47,6 +47,13 @@ class GradeStatisticsFragment : BaseFragment(), GradeStatisticsView, GradeView.G
 
     override val isBarViewEmpty get() = gradeStatisticsChartPoints.isEmpty
 
+    override val currentType
+        get() = when (gradeStatisticsTypeSwitch.checkedRadioButtonId) {
+            R.id.gradeStatisticsTypeSemester -> ViewType.SEMESTER
+            R.id.gradeStatisticsTypePartial -> ViewType.PARTIAL
+            else -> ViewType.POINTS
+        }
+
     private lateinit var gradeColors: List<Pair<Int, Int>>
 
     private val vulcanGradeColors = listOf(
@@ -111,9 +118,11 @@ class GradeStatisticsFragment : BaseFragment(), GradeStatisticsView, GradeView.G
             setOnItemSelectedListener<TextView> { presenter.onSubjectSelected(it?.text?.toString()) }
         }
 
-        gradeStatisticsSwipe.setOnRefreshListener(presenter::onSwipeRefresh)
-
         gradeStatisticsSubjectsContainer.setElevationCompat(requireContext().dpToPx(1f))
+
+        gradeStatisticsSwipe.setOnRefreshListener(presenter::onSwipeRefresh)
+        gradeStatisticsErrorRetry.setOnClickListener { presenter.onRetry() }
+        gradeStatisticsErrorDetails.setOnClickListener { presenter.onDetailsClick() }
     }
 
     override fun updateSubjects(data: ArrayList<String>) {
@@ -228,6 +237,14 @@ class GradeStatisticsFragment : BaseFragment(), GradeStatisticsView, GradeView.G
         gradeStatisticsEmpty.visibility = if (show) View.VISIBLE else View.INVISIBLE
     }
 
+    override fun showErrorView(show: Boolean) {
+        gradeStatisticsError.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    override fun setErrorDetails(message: String) {
+        gradeStatisticsErrorMessage.text = message
+    }
+
     override fun showProgress(show: Boolean) {
         gradeStatisticsProgress.visibility = if (show) View.VISIBLE else View.GONE
     }
@@ -262,13 +279,7 @@ class GradeStatisticsFragment : BaseFragment(), GradeStatisticsView, GradeView.G
 
     override fun onResume() {
         super.onResume()
-        gradeStatisticsTypeSwitch.setOnCheckedChangeListener { _, checkedId ->
-            presenter.onTypeChange(when (checkedId) {
-                R.id.gradeStatisticsTypeSemester -> ViewType.SEMESTER
-                R.id.gradeStatisticsTypePartial -> ViewType.PARTIAL
-                else -> ViewType.POINTS
-            })
-        }
+        gradeStatisticsTypeSwitch.setOnCheckedChangeListener { _, _ -> presenter.onTypeChange() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

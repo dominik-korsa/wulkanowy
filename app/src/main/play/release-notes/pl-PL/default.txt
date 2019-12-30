@@ -1,9 +1,7 @@
-Wersja 0.12.0
+Wersja 0.14.0
 
-- wsparcie dla dziennika Lubelskiego Portalu Oświatowego
-- naprawa problemów z wyświetlaniem ocen punktowych
-- automatyczne przełączanie motywu na androidzie 10
-- wyświetlanie pomocy przy problemach z logowaniem
-- wyświetlanie informacji o szkole
+- dodane zostały nowe opcje logowania, m.in. logowanie przez token
+- naprawione zostało wyświetlanie nauczyciela, kiedy zastępstwo zostanie usunięte z danej lekcji
+- naprawiony został biały ekran w szczęśliwym numerku
 
 Pełna lista zmian: https://github.com/wulkanowy/wulkanowy/releases
