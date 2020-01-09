@@ -4,6 +4,7 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
 import androidx.work.BackoffPolicy.EXPONENTIAL
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.ExistingPeriodicWorkPolicy.REPLACE
 import androidx.work.ExistingWorkPolicy
@@ -66,6 +67,11 @@ class SyncManager @Inject constructor(
     fun startOneTimeSyncWorker() {
         workManager.enqueueUniqueWork(SyncWorker::class.java.simpleName, ExistingWorkPolicy.REPLACE,
             OneTimeWorkRequestBuilder<SyncWorker>()
+                .setInputData(
+                    Data.Builder()
+                        .putBoolean("one-time", true)
+                        .build()
+                )
                 .build()
         )
     }
