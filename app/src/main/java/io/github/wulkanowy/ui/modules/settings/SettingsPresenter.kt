@@ -7,6 +7,7 @@ import com.readystatesoftware.chuck.api.ChuckCollector
 import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.services.sync.SyncManager
+import io.github.wulkanowy.services.sync.works.Work
 import io.github.wulkanowy.ui.base.BasePresenter
 import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.AppInfo
@@ -59,12 +60,17 @@ class SettingsPresenter @Inject constructor(
         analytics.logEvent("sync_now_clicked")
         with(view) {
             if (this == null) return
+            setSyncInProgress(true)
             syncManager.startOneTimeSyncWorker().observe(this.lifecycleOwner, Observer { workInfo ->
                 if (workInfo != null) {
                     if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                         showSyncSuccess()
+                        setSyncInProgress(false)
                     } else if (workInfo.state == WorkInfo.State.FAILED) {
                         showSyncFailed(Throwable(workInfo.outputData.getString("error")))
+                        setSyncInProgress(false)
+                    } else if (workInfo.state == WorkInfo.State.CANCELLED) {
+                        setSyncInProgress(false)
                     }
                 }
             })

@@ -334,6 +334,7 @@
     <string name="pref_services_force_sync">Synchronizuj teraz</string>
     <string name="pref_services_message_sync_success">Zsynchronizowano!</string>
     <string name="pref_services_message_sync_failed">Synchronizacja nie powiodła się</string>
+    <string name="pref_services_sync_in_progress">Synchronizacja w trakcie</string>
 
     <string name="pref_other_header">Inne</string>
     <string name="pref_other_grade_modifier_plus">Wartość plusa</string>

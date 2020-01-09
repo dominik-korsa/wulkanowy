@@ -18,4 +18,6 @@ interface SettingsView : BaseView {
     fun showSyncSuccess()
 
     fun showSyncFailed(error: Throwable)
+
+    fun setSyncInProgress(inProgress: Boolean)
 }

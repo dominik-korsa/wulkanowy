@@ -13,7 +13,6 @@ import io.github.wulkanowy.ui.base.BaseActivity
 import io.github.wulkanowy.ui.base.ErrorDialog
 import io.github.wulkanowy.ui.modules.main.MainView
 import io.github.wulkanowy.utils.AppInfo
-import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsFragment : PreferenceFragmentCompat(),
@@ -86,6 +85,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun showSyncFailed(error: Throwable) {
         showError(requireContext().getString(R.string.pref_services_message_sync_failed), error)
+    }
+
+    override fun setSyncInProgress(inProgress: Boolean) {
+        val preference = findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?
+        preference?.isEnabled = !inProgress
+        if (inProgress) preference?.setSummary(R.string.pref_services_sync_in_progress)
+        else preference?.summary = null
     }
 
     override fun showError(text: String, error: Throwable) {
