@@ -53,7 +53,7 @@ class SyncWorker @AssistedInject constructor(
             .onErrorReturn {
                 Timber.e(it, "There was an error during synchronization")
                 if (it is FeatureDisabledException) Result.success()
-                else Result.retry()
+                else Result.retry() // TODO: Disable retrying and show errors on screen when synced manually
             }
             .doOnSuccess {
                 if (preferencesRepository.isDebugNotificationEnable) notify(it)

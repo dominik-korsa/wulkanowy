@@ -6,8 +6,10 @@ import androidx.work.BackoffPolicy.EXPONENTIAL
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.ExistingPeriodicWorkPolicy.REPLACE
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import io.github.wulkanowy.data.db.SharedPrefProvider
@@ -42,13 +44,13 @@ class SyncManager @Inject constructor(
         }
 
         if (sharedPrefProvider.getLong(APP_VERSION_CODE_KEY, -1L) != appInfo.versionCode.toLong()) {
-            startSyncWorker(true)
+            startPeriodicSyncWorker(true)
             sharedPrefProvider.putLong(APP_VERSION_CODE_KEY, appInfo.versionCode.toLong(), true)
         }
         Timber.i("SyncManager was initialized")
     }
 
-    fun startSyncWorker(restart: Boolean = false) {
+    fun startPeriodicSyncWorker(restart: Boolean = false) {
         if (preferencesRepository.isServiceEnabled && !now().isHolidays) {
             workManager.enqueueUniquePeriodicWork(SyncWorker::class.java.simpleName, if (restart) REPLACE else KEEP,
                 PeriodicWorkRequestBuilder<SyncWorker>(preferencesRepository.servicesInterval, MINUTES)
@@ -59,6 +61,13 @@ class SyncManager @Inject constructor(
                         .build())
                     .build())
         }
+    }
+
+    fun startOneTimeSyncWorker() {
+        workManager.enqueueUniqueWork(SyncWorker::class.java.simpleName, ExistingWorkPolicy.REPLACE,
+            OneTimeWorkRequestBuilder<SyncWorker>()
+                .build()
+        )
     }
 
     fun stopSyncWorker() {

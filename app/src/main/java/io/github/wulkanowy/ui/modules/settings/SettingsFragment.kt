@@ -12,6 +12,7 @@ import io.github.wulkanowy.ui.base.BaseActivity
 import io.github.wulkanowy.ui.base.ErrorDialog
 import io.github.wulkanowy.ui.modules.main.MainView
 import io.github.wulkanowy.utils.AppInfo
+import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsFragment : PreferenceFragmentCompat(),
@@ -36,6 +37,14 @@ class SettingsFragment : PreferenceFragmentCompat(),
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun initView() {
+        val preference = findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?
+        preference?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            presenter.onSyncNowClicked()
+            true
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

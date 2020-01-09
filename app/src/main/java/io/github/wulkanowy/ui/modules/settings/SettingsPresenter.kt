@@ -29,6 +29,7 @@ class SettingsPresenter @Inject constructor(
         super.onAttachView(view)
         Timber.i("Settings view was initialized")
         view.setServicesSuspended(preferencesRepository.serviceEnableKey, now().isHolidays)
+        view.initView()
     }
 
     fun onSharedPreferenceChanged(key: String) {
@@ -36,8 +37,8 @@ class SettingsPresenter @Inject constructor(
 
         with(preferencesRepository) {
             when (key) {
-                serviceEnableKey -> with(syncManager) { if (isServiceEnabled) startSyncWorker() else stopSyncWorker() }
-                servicesIntervalKey, servicesOnlyWifiKey -> syncManager.startSyncWorker(true)
+                serviceEnableKey -> with(syncManager) { if (isServiceEnabled) startPeriodicSyncWorker() else stopSyncWorker() }
+                servicesIntervalKey, servicesOnlyWifiKey -> syncManager.startPeriodicSyncWorker(true)
                 isDebugNotificationEnableKey -> chuckCollector.showNotification(isDebugNotificationEnable)
                 appThemeKey -> view?.recreateView()
                 appLanguageKey -> view?.run {
@@ -48,5 +49,11 @@ class SettingsPresenter @Inject constructor(
             }
         }
         analytics.logEvent("setting_changed", "name" to key)
+    }
+
+    fun onSyncNowClicked() {
+        syncManager.startOneTimeSyncWorker()
+        Timber.i("Setting sync now clicked")
+        analytics.logEvent("sync_now_clicked")
     }
 }
