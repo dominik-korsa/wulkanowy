@@ -5,6 +5,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.BigTextStyle
 import androidx.core.app.NotificationCompat.PRIORITY_DEFAULT
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.RxWorker
 import androidx.work.WorkerParameters
@@ -52,10 +53,13 @@ class SyncWorker @AssistedInject constructor(
             .toSingleDefault(Result.success())
             .onErrorReturn {
                 Timber.e(it, "There was an error during synchronization")
-                // TODO: Show errors on screen when synced manually
                 when {
                     it is FeatureDisabledException -> Result.success()
-                    inputData.getBoolean("one-time", false) -> Result.failure()
+                    inputData.getBoolean("one_time", false) -> {
+                        Result.failure(Data.Builder()
+                            .putString("error", it.toString())
+                            .build())
+                    }
                     else -> Result.retry()
                 }
             }

@@ -1,5 +1,8 @@
 package io.github.wulkanowy.ui.modules.settings
 
+import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
+import androidx.work.WorkInfo
 import com.readystatesoftware.chuck.api.ChuckCollector
 import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
@@ -52,8 +55,19 @@ class SettingsPresenter @Inject constructor(
     }
 
     fun onSyncNowClicked() {
-        syncManager.startOneTimeSyncWorker()
         Timber.i("Setting sync now clicked")
         analytics.logEvent("sync_now_clicked")
+        with(view) {
+            if (this == null) return
+            syncManager.startOneTimeSyncWorker().observe(this.lifecycleOwner, Observer { workInfo ->
+                if (workInfo != null) {
+                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                        showSyncSuccess()
+                    } else if (workInfo.state == WorkInfo.State.FAILED) {
+                        showSyncFailed(Throwable(workInfo.outputData.getString("error")))
+                    }
+                }
+            })
+        }
     }
 }

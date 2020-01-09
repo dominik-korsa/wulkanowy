@@ -3,6 +3,7 @@ package io.github.wulkanowy.ui.modules.settings
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.lifecycle.LifecycleOwner
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.yariksoffice.lingver.Lingver
@@ -31,6 +32,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
     companion object {
         fun newInstance() = SettingsFragment()
     }
+
+    override val lifecycleOwner: LifecycleOwner
+        get() = viewLifecycleOwner
 
     override val titleStringId get() = R.string.settings_title
 
@@ -74,6 +78,14 @@ class SettingsFragment : PreferenceFragmentCompat(),
             summary = if (isHolidays) getString(R.string.pref_services_suspended) else ""
             isEnabled = !isHolidays
         }
+    }
+
+    override fun showSyncSuccess() {
+        showMessage(requireContext().getString(R.string.pref_services_message_sync_success))
+    }
+
+    override fun showSyncFailed(error: Throwable) {
+        showError(requireContext().getString(R.string.pref_services_message_sync_failed), error)
     }
 
     override fun showError(text: String, error: Throwable) {
