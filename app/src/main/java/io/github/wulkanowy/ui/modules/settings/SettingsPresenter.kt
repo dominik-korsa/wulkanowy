@@ -54,8 +54,7 @@ class SettingsPresenter @Inject constructor(
     }
 
     fun onSyncNowClicked() {
-        with(view) {
-            if (this == null) return
+        view?.run {
             showForceSyncDialog()
                 .subscribe {agreed ->
                     if (agreed) {
