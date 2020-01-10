@@ -54,36 +54,32 @@ class SettingsPresenter @Inject constructor(
     }
 
     fun onSyncNowClicked() {
+        view?.showForceSyncDialog()
+    }
+
+    fun onForceSyncDialogSubmit() {
         view?.run {
-            showForceSyncDialog()
-                .subscribe {agreed ->
-                    if (agreed) {
-                        Timber.i("Setting sync now started")
-                        analytics.logEvent("sync_now_started")
-                        setSyncInProgress(true)
-                        syncManager.startOneTimeSyncWorker().observe(this.lifecycleOwner, Observer { workInfo ->
-                            if (workInfo != null) {
-                                when (workInfo.state) {
-                                    WorkInfo.State.SUCCEEDED -> {
-                                        showSyncSuccess()
-                                        setSyncInProgress(false)
-                                    }
-                                    WorkInfo.State.FAILED -> {
-                                        showSyncFailed(Throwable(workInfo.outputData.getString("error")))
-                                        setSyncInProgress(false)
-                                    }
-                                    WorkInfo.State.CANCELLED -> {
-                                        setSyncInProgress(false)
-                                    }
-                                    else -> {}
-                                }
-                            }
-                        })
-                    } else {
-                        Timber.i("Setting sync now canceled")
-                        analytics.logEvent("sync_now_canceled")
+            Timber.i("Setting sync now started")
+            analytics.logEvent("sync_now_started")
+            setSyncInProgress(true)
+            syncManager.startOneTimeSyncWorker().observe(this.lifecycleOwner, Observer { workInfo ->
+                if (workInfo != null) {
+                    when (workInfo.state) {
+                        WorkInfo.State.SUCCEEDED -> {
+                            showSyncSuccess()
+                            setSyncInProgress(false)
+                        }
+                        WorkInfo.State.FAILED -> {
+                            showSyncFailed(Throwable(workInfo.outputData.getString("error")))
+                            setSyncInProgress(false)
+                        }
+                        WorkInfo.State.CANCELLED -> {
+                            setSyncInProgress(false)
+                        }
+                        else -> {}
                     }
                 }
+            })
         }
     }
 }

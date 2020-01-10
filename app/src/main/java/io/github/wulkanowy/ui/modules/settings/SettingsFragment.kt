@@ -117,15 +117,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
         ErrorDialog.newInstance(error).show(childFragmentManager, error.toString())
     }
 
-    override fun showForceSyncDialog(): Single<Boolean> {
-        return Single.create<Boolean> { emitter ->
-            AlertDialog.Builder(requireContext())
-                .setTitle(R.string.pref_services_dialog_force_sync_title)
-                .setMessage(R.string.pref_services_dialog_force_sync_summary)
-                .setPositiveButton(android.R.string.ok) { _, _ -> emitter.onSuccess(true)}
-                .setNegativeButton(android.R.string.cancel) {_,_ -> emitter.onSuccess(false) }
-                .show()
-        }
+    override fun showForceSyncDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.pref_services_dialog_force_sync_title)
+            .setMessage(R.string.pref_services_dialog_force_sync_summary)
+            .setPositiveButton(android.R.string.ok) { _, _ -> presenter.onForceSyncDialogSubmit()}
+            .setNegativeButton(android.R.string.cancel) {_,_ -> }
+            .show()
     }
 
     override fun onResume() {
