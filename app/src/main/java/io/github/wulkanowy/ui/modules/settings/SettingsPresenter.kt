@@ -1,13 +1,11 @@
 package io.github.wulkanowy.ui.modules.settings
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.work.WorkInfo
 import com.readystatesoftware.chuck.api.ChuckCollector
 import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.services.sync.SyncManager
-import io.github.wulkanowy.services.sync.works.Work
 import io.github.wulkanowy.ui.base.BasePresenter
 import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.AppInfo
@@ -56,24 +54,37 @@ class SettingsPresenter @Inject constructor(
     }
 
     fun onSyncNowClicked() {
-        Timber.i("Setting sync now clicked")
-        analytics.logEvent("sync_now_clicked")
         with(view) {
             if (this == null) return
-            setSyncInProgress(true)
-            syncManager.startOneTimeSyncWorker().observe(this.lifecycleOwner, Observer { workInfo ->
-                if (workInfo != null) {
-                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
-                        showSyncSuccess()
-                        setSyncInProgress(false)
-                    } else if (workInfo.state == WorkInfo.State.FAILED) {
-                        showSyncFailed(Throwable(workInfo.outputData.getString("error")))
-                        setSyncInProgress(false)
-                    } else if (workInfo.state == WorkInfo.State.CANCELLED) {
-                        setSyncInProgress(false)
+            showForceSyncDialog()
+                .subscribe {agreed ->
+                    if (agreed) {
+                        Timber.i("Setting sync now started")
+                        analytics.logEvent("sync_now_started")
+                        setSyncInProgress(true)
+                        syncManager.startOneTimeSyncWorker().observe(this.lifecycleOwner, Observer { workInfo ->
+                            if (workInfo != null) {
+                                when (workInfo.state) {
+                                    WorkInfo.State.SUCCEEDED -> {
+                                        showSyncSuccess()
+                                        setSyncInProgress(false)
+                                    }
+                                    WorkInfo.State.FAILED -> {
+                                        showSyncFailed(Throwable(workInfo.outputData.getString("error")))
+                                        setSyncInProgress(false)
+                                    }
+                                    WorkInfo.State.CANCELLED -> {
+                                        setSyncInProgress(false)
+                                    }
+                                    else -> {}
+                                }
+                            }
+                        })
+                    } else {
+                        Timber.i("Setting sync now canceled")
+                        analytics.logEvent("sync_now_canceled")
                     }
                 }
-            })
         }
     }
 }

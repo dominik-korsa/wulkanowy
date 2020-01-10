@@ -3,6 +3,7 @@ package io.github.wulkanowy.ui.modules.settings
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -13,6 +14,8 @@ import io.github.wulkanowy.ui.base.BaseActivity
 import io.github.wulkanowy.ui.base.ErrorDialog
 import io.github.wulkanowy.ui.modules.main.MainView
 import io.github.wulkanowy.utils.AppInfo
+import io.reactivex.Single
+import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsFragment : PreferenceFragmentCompat(),
@@ -112,6 +115,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun showErrorDetailsDialog(error: Throwable) {
         ErrorDialog.newInstance(error).show(childFragmentManager, error.toString())
+    }
+
+    override fun showForceSyncDialog(): Single<Boolean> {
+        return Single.create<Boolean> { emitter ->
+            AlertDialog.Builder(requireContext())
+                .setTitle(R.string.pref_services_dialog_force_sync_title)
+                .setMessage(R.string.pref_services_dialog_force_sync_summary)
+                .setPositiveButton(android.R.string.ok) { _, _ -> emitter.onSuccess(true)}
+                .setNegativeButton(android.R.string.cancel) {_,_ -> emitter.onSuccess(false) }
+                .show()
+        }
     }
 
     override fun onResume() {

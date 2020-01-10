@@ -2,6 +2,7 @@ package io.github.wulkanowy.ui.modules.settings
 
 import androidx.lifecycle.LifecycleOwner
 import io.github.wulkanowy.ui.base.BaseView
+import io.reactivex.Single
 
 interface SettingsView : BaseView {
 
@@ -20,4 +21,6 @@ interface SettingsView : BaseView {
     fun showSyncFailed(error: Throwable)
 
     fun setSyncInProgress(inProgress: Boolean)
+
+    fun showForceSyncDialog() : Single<Boolean>
 }
