@@ -2,6 +2,8 @@ package io.github.wulkanowy.ui.modules.timetable
 
 import android.annotation.SuppressLint
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
+import io.github.wulkanowy.data.db.entities.Timetable
+import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
 import io.github.wulkanowy.data.repositories.semester.SemesterRepository
 import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.data.repositories.timetable.TimetableRepository
@@ -31,6 +33,7 @@ class TimetablePresenter @Inject constructor(
     studentRepository: StudentRepository,
     private val timetableRepository: TimetableRepository,
     private val semesterRepository: SemesterRepository,
+    private val prefRepository: PreferencesRepository,
     private val analytics: FirebaseAnalyticsHelper
 ) : BasePresenter<TimetableView>(errorHandler, studentRepository, schedulers) {
 
@@ -159,15 +162,7 @@ class TimetablePresenter @Inject constructor(
                 .flatMap { semesterRepository.getCurrentSemester(it) }
                 .delay(200, MILLISECONDS)
                 .flatMap { timetableRepository.getTimetable(it, currentDate, currentDate, forceRefresh) }
-                .map {  items ->
-                    var previousLessonEnd: LocalDateTime? = null
-                    items.map { lesson ->
-                        val item = TimetableItem(lesson, previousLessonEnd)
-                        if (!lesson.canceled)
-                            previousLessonEnd = lesson.end
-                       item
-                   }
-                }
+                .map { createTimetableItems(it) }
                 .map { items -> items.sortedBy { it.lesson.number } }
                 .subscribeOn(schedulers.backgroundThread)
                 .observeOn(schedulers.mainThread)
@@ -203,6 +198,18 @@ class TimetablePresenter @Inject constructor(
                 showEmpty(false)
             } else showError(message, error)
         }
+    }
+
+    private fun createTimetableItems(items: List<Timetable>): List<TimetableItem> {
+        var previousLessonEnd: LocalDateTime? = null
+        return items
+            .filter { if (prefRepository.showWholeClassPlan == "no") it.studentPlan else true }
+            .map { 
+                val item = TimetableItem(it, prefRepository.showWholeClassPlan, previousLessonEnd)
+                if (!lesson.canceled && lesson.studentPlan)
+                    previousLessonEnd = lesson.end
+                item
+            }
     }
 
     private fun reloadView() {

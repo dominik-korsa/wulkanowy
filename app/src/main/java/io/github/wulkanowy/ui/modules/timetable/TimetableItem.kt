@@ -17,11 +17,15 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_timetable.*
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
+import kotlinx.android.synthetic.main.item_timetable_small.*
 
-class TimetableItem(val lesson: Timetable, private val previousLessonEnd: LocalDateTime?) :
+class TimetableItem(val lesson: Timetable, private val showWholeClassPlan: String, private val previousLessonEnd: LocalDateTime?) :
     AbstractFlexibleItem<TimetableItem.ViewHolder>() {
 
-    override fun getLayoutRes() = R.layout.item_timetable
+    override fun getLayoutRes() = when {
+        showWholeClassPlan == "small" && !lesson.studentPlan -> R.layout.item_timetable_small
+        else -> R.layout.item_timetable
+    }
 
     override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<*>>): ViewHolder {
         return ViewHolder(view, adapter)
@@ -31,17 +35,30 @@ class TimetableItem(val lesson: Timetable, private val previousLessonEnd: LocalD
 
     @SuppressLint("SetTextI18n")
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<*>>, holder: ViewHolder, position: Int, payloads: MutableList<Any>?) {
-        updateFields(holder)
+        when (itemViewType) {
+            R.layout.item_timetable_small -> {
+                with(holder) {
+                    timetableSmallItemNumber.text = lesson.number.toString()
+                    timetableSmallItemSubject.text = lesson.subject
+                    timetableSmallItemTimeStart.text = lesson.start.toFormattedString("HH:mm")
+                    timetableSmallItemRoom.text = lesson.room
+                    timetableSmallItemTeacher.text = lesson.teacher
+                }
+            }
+            R.layout.item_timetable -> {
+                updateFields(holder)
 
-        with(holder) {
-            timetableItemSubject.paintFlags =
-                if (lesson.canceled) timetableItemSubject.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                else timetableItemSubject.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                with(holder) {
+                    timetableItemSubject.paintFlags =
+                        if (lesson.canceled) timetableItemSubject.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        else timetableItemSubject.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                }
+
+                updateDescription(holder)
+                updateColors(holder)
+                updateTimeLeft(holder)
+            }
         }
-
-        updateDescription(holder)
-        updateColors(holder)
-        updateTimeLeft(holder)
     }
 
     private fun updateFields(holder: ViewHolder) {
@@ -60,8 +77,6 @@ class TimetableItem(val lesson: Timetable, private val previousLessonEnd: LocalD
     }
 
     private fun updateTimeLeft(holder: ViewHolder) {
-        Timber.i("Started ${LocalDateTime.now().isAfter(lesson.start)}")
-
         val displayState = TimetableItemDisplayState(lesson, previousLessonEnd)
 
         lastTimeLeftShownCode = displayState.code
