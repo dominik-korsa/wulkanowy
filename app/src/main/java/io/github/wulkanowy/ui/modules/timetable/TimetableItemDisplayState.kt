@@ -22,12 +22,14 @@ class TimetableItemDisplayState(lesson: Timetable, previousLessonEnd: LocalDateT
     init {
         showTimeUntil =
             when {
+                !lesson.studentPlan -> false
                 lesson.canceled -> false
                 LocalDateTime.now().isAfter(lesson.start) -> false
                 previousLessonEnd != null && LocalDateTime.now().isBefore(previousLessonEnd) -> false
                 else -> timeUntil <= Duration.ofMinutes(60)
             }
         code = when {
+            !lesson.studentPlan -> null
             justFinished -> "just finished"
             showTimeUntil ->
                 if (timeUntil.seconds <= 60) "in ${timeUntil.seconds.toInt()} s"

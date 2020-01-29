@@ -16,7 +16,6 @@ import io.github.wulkanowy.utils.toFormattedString
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_timetable.*
 import org.threeten.bp.LocalDateTime
-import timber.log.Timber
 import kotlinx.android.synthetic.main.item_timetable_small.*
 
 class TimetableItem(val lesson: Timetable, private val showWholeClassPlan: String, private val previousLessonEnd: LocalDateTime?) :
