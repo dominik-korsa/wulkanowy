@@ -90,11 +90,12 @@ class TimetableItem(val lesson: Timetable, private val showWholeClassPlan: Strin
                 displayState.showTimeUntil -> {
                     timetableItemTimeUntil.visibility = VISIBLE
                     timetableItemTimeLeft.visibility = GONE
-                    timetableItemTimeUntil.text = String.format(view.context.getString(R.string.timetable_time_until),
+                    timetableItemTimeUntil.text = view.context.getString(
+                        R.string.timetable_time_until,
                         if (displayState.timeUntil.seconds <= 60) {
-                            String.format(view.context.getString(R.string.timetable_seconds), displayState.timeUntil.seconds.toString(10))
+                            view.context.getString(R.string.timetable_seconds, displayState.timeUntil.seconds.toString(10))
                         } else {
-                            String.format(view.context.getString(R.string.timetable_minutes), displayState.timeUntil.toMinutes().toString(10))
+                            view.context.getString(R.string.timetable_minutes, displayState.timeUntil.toMinutes().toString(10))
                         }
                     )
                 }
@@ -105,11 +106,12 @@ class TimetableItem(val lesson: Timetable, private val showWholeClassPlan: Strin
                 else -> {
                     timetableItemTimeUntil.visibility = GONE
                     timetableItemTimeLeft.visibility = VISIBLE
-                    timetableItemTimeLeft.text = String.format(view.context.getString(R.string.timetable_time_left),
+                    timetableItemTimeLeft.text = view.context.getString(
+                        R.string.timetable_time_left,
                         if (displayState.timeLeft.seconds <= 60) {
-                            String.format(view.context.getString(R.string.timetable_seconds), displayState.timeLeft.seconds.toString(10))
+                            view.context.getString(R.string.timetable_seconds, displayState.timeLeft.seconds.toString(10))
                         } else {
-                            String.format(view.context.getString(R.string.timetable_minutes), displayState.timeLeft.toMinutes().toString(10))
+                            view.context.getString(R.string.timetable_minutes, displayState.timeLeft.toMinutes().toString(10))
                         }
                     )
                 }
