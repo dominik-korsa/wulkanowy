@@ -1,6 +1,5 @@
 package io.github.wulkanowy.ui.modules.settings
 
-import androidx.lifecycle.Observer
 import androidx.work.WorkInfo
 import com.readystatesoftware.chuck.api.ChuckCollector
 import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
@@ -62,8 +61,8 @@ class SettingsPresenter @Inject constructor(
             Timber.i("Setting sync now started")
             analytics.logEvent("sync_now_started")
             setSyncInProgress(true)
-            syncManager.startOneTimeSyncWorker().observe(this.lifecycleOwner, Observer { workInfo ->
-                if (workInfo != null) {
+            disposable.add(syncManager.startOneTimeSyncWorker()
+                .subscribe ({ workInfo ->
                     when (workInfo.state) {
                         WorkInfo.State.SUCCEEDED -> {
                             showSyncSuccess()
@@ -78,8 +77,11 @@ class SettingsPresenter @Inject constructor(
                         }
                         else -> {}
                     }
-                }
-            })
+                }, {
+                    Timber.e("Force sync failed")
+                    Timber.e(it)
+                })
+            )
         }
     }
 }
