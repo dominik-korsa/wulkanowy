@@ -60,27 +60,15 @@ class SettingsPresenter @Inject constructor(
         view?.run {
             Timber.i("Setting sync now started")
             analytics.logEvent("sync_now_started")
-            setSyncInProgress(true)
             disposable.add(syncManager.startOneTimeSyncWorker()
+                .doOnSubscribe { setSyncInProgress(true) }
+                .doFinally { setSyncInProgress(false) }
                 .subscribe({ workInfo ->
-                    when (workInfo.state) {
-                        WorkInfo.State.SUCCEEDED -> {
-                            showSyncSuccess()
-                            setSyncInProgress(false)
-                        }
-                        WorkInfo.State.FAILED -> {
-                            showSyncFailed(Throwable(workInfo.outputData.getString("error")))
-                            setSyncInProgress(false)
-                        }
-                        WorkInfo.State.CANCELLED -> {
-                            setSyncInProgress(false)
-                        }
-                        else -> {
-                        }
-                    }
+                    if (workInfo.state == WorkInfo.State.SUCCEEDED) showMessage(syncSuccessString)
+                    else if (workInfo.state == WorkInfo.State.FAILED) showError(syncFailedString, Throwable(workInfo.outputData.getString("error")))
                 }, {
-                    Timber.e("Force sync failed")
-                    Timber.e(it)
+                    Timber.e("Sync now failed")
+                    errorHandler.dispatch(it)
                 })
             )
         }

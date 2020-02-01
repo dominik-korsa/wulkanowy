@@ -34,14 +34,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override val titleStringId get() = R.string.settings_title
 
+    override val syncSuccessString get() = getString(R.string.pref_services_message_sync_success)
+
+    override val syncFailedString get() = getString(R.string.pref_services_message_sync_failed)
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 
     override fun initView() {
-        val preference = findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?
-        preference?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        (findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             presenter.onSyncNowClicked()
             true
         }
@@ -76,19 +79,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
         }
     }
 
-    override fun showSyncSuccess() {
-        showMessage(requireContext().getString(R.string.pref_services_message_sync_success))
-    }
-
-    override fun showSyncFailed(error: Throwable) {
-        showError(requireContext().getString(R.string.pref_services_message_sync_failed), error)
-    }
-
     override fun setSyncInProgress(inProgress: Boolean) {
-        val preference = findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?
-        preference?.isEnabled = !inProgress
-        if (inProgress) preference?.setSummary(R.string.pref_services_sync_in_progress)
-        else preference?.summary = null
+        (findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?)?.apply {
+            isEnabled = !inProgress
+            summary = if (inProgress) getString(R.string.pref_services_sync_in_progress) else ""
+        }
     }
 
     override fun showError(text: String, error: Throwable) {

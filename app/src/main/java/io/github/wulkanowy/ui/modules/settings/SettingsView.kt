@@ -4,6 +4,10 @@ import io.github.wulkanowy.ui.base.BaseView
 
 interface SettingsView : BaseView {
 
+    val syncSuccessString: String
+
+    val syncFailedString: String
+
     fun initView()
 
     fun recreateView()
@@ -11,10 +15,6 @@ interface SettingsView : BaseView {
     fun updateLanguage(langCode: String)
 
     fun setServicesSuspended(serviceEnablesKey: String, isHolidays: Boolean)
-
-    fun showSyncSuccess()
-
-    fun showSyncFailed(error: Throwable)
 
     fun setSyncInProgress(inProgress: Boolean)
 
