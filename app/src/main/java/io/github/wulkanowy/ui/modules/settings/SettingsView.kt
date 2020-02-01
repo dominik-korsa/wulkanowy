@@ -1,11 +1,8 @@
 package io.github.wulkanowy.ui.modules.settings
 
-import androidx.lifecycle.LifecycleOwner
 import io.github.wulkanowy.ui.base.BaseView
 
 interface SettingsView : BaseView {
-
-    val lifecycleOwner: LifecycleOwner
 
     fun initView()
 

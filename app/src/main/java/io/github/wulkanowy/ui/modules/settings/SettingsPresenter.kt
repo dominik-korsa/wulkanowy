@@ -62,7 +62,7 @@ class SettingsPresenter @Inject constructor(
             analytics.logEvent("sync_now_started")
             setSyncInProgress(true)
             disposable.add(syncManager.startOneTimeSyncWorker()
-                .subscribe ({ workInfo ->
+                .subscribe({ workInfo ->
                     when (workInfo.state) {
                         WorkInfo.State.SUCCEEDED -> {
                             showSyncSuccess()
@@ -75,7 +75,8 @@ class SettingsPresenter @Inject constructor(
                         WorkInfo.State.CANCELLED -> {
                             setSyncInProgress(false)
                         }
-                        else -> {}
+                        else -> {
+                        }
                     }
                 }, {
                     Timber.e("Force sync failed")
