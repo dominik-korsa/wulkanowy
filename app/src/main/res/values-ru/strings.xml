@@ -21,13 +21,18 @@
     <string name="homework_title">Домашние задания</string>
     <string name="account_title">Выберите аккаунт</string>
 
+    <!--Subtitles-->
+    <string name="grade_subtitle">Семестр %d, %d/%d</string>
+
 
     <!--Login-->
     <string name="login_header_default">Авторизируйтесь при помощи аккаунта ученика или родителя</string>
     <string name="login_header_symbol">Впишите \"symbol\"</string>
-    <string name="login_nickname_hint">Электронная почта или имя пользователя</string>
+    <string name="login_nickname_hint">Имя пользователя</string>
+    <string name="login_email_hint">Электронная почта</string>
+    <string name="login_login_pesel_email_hint">Логин, PESEL или электронная почта</string>
     <string name="login_password_hint">Пароль</string>
-    <string name="login_host_hint">Дневник</string>
+    <string name="login_host_hint">Дневник UONET+</string>
     <string name="login_type_api">Мобильный API</string>
     <string name="login_type_scrapper">Scraper</string>
     <string name="login_type_hybrid">Гибрид</string>
@@ -41,6 +46,7 @@
     <string name="login_invalid_pin">Недействительный PIN</string>
     <string name="login_invalid_token">Недействительный token</string>
     <string name="login_expired_token">Токен просрочен</string>
+    <string name="login_invalid_email">Неверный адрес электронной почты</string>
     <string name="login_invalid_symbol">Недействительный symbol</string>
     <string name="login_incorrect_symbol">Не удалось найти ученика. Пожалуйста, проверьте \"symbol\"</string>
     <string name="login_field_required">Это поле обязательно</string>
@@ -53,6 +59,10 @@
     <string name="login_contact_email">Электронная почта</string>
     <string name="login_contact_discord">Discord</string>
     <string name="login_email_intent_title">Отправить письмо</string>
+    <string name="login_recover">восстановление</string>
+    <string name="login_recover_button">Я не помню пароль</string>
+    <string name="login_recover_title">Восстановите свой аккаунт</string>
+    <string name="login_signed_in">Студент уже вошел в систему</string>
 
 
     <!--Main-->
@@ -146,6 +156,7 @@
 
     <!--Attendance summary-->
     <string name="attendance_summary_final">Посещаемость</string>
+    <string name="attendance_summary_total">вместе</string>
 
 
     <!--Exam-->
@@ -289,6 +300,16 @@
     <string name="license_dialog_title">Лицензия</string>
 
 
+    <!--Creators-->
+    <string name="creator_avatar_description">аватар</string>
+    <string name="creator_see_more">Смотрите больше на GitHub</string>
+
+    <!--Log viewer-->
+    <string name="logviewer_title">Просмотр журнала</string>
+    <string name="logviewer_share">Share logs</string>
+    <string name="logviewer_refresh">Обновление</string>
+
+
     <!--Generic-->
     <string name="all_content">Содержание</string>
     <string name="all_retry">Снова</string>
@@ -366,5 +387,9 @@
     <string name="error_feature_disabled">Функция была выключена школой</string>
     <string name="error_feature_not_available">Функция не доступна в этом режиме</string>
     <string name="pref_view_timetable_show_whole_class">Показать уроки всего класса</string>
+    <string name="channel_new_grades">Новые оценки</string>
+    <string name="channel_lucky_number">Счастливый номер</string>
+    <string name="channel_new_message">Новые сообщения</string>
+    <string name="channel_new_notes">Новые заметки</string>
 
 </resources>
