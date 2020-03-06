@@ -68,7 +68,6 @@ class SettingsPresenter @Inject constructor(
                     else if (workInfo.state == WorkInfo.State.FAILED) showError(syncFailedString, Throwable(workInfo.outputData.getString("error")))
                 }, {
                     Timber.e("Sync now failed")
-                    errorHandler.dispatch(it)
                 })
             )
         }
