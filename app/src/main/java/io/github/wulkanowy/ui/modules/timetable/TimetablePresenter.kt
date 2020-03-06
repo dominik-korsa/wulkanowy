@@ -206,7 +206,7 @@ class TimetablePresenter @Inject constructor(
             .filter { if (prefRepository.showWholeClassPlan == "no") it.isStudentPlan else true }
             .map { 
                 val item = TimetableItem(it, prefRepository.showWholeClassPlan, previousLessonEnd)
-                if (!it.canceled && it.studentPlan)
+                if (!it.canceled && it.isStudentPlan)
                     previousLessonEnd = it.end
                 item
             }
