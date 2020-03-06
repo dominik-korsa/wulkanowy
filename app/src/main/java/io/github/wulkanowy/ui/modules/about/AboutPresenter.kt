@@ -27,6 +27,11 @@ class AboutPresenter @Inject constructor(
         if (item !is AboutItem) return
         view?.run {
             when (item.title) {
+                versionRes?.first -> {
+                    Timber.i("Opening log viewer")
+                    openLogViewer()
+                    analytics.logEvent("about_open", "name" to "log_viewer")
+                }
                 feedbackRes?.first -> {
                     Timber.i("Opening email client")
                     openEmailClient()
@@ -52,6 +57,11 @@ class AboutPresenter @Inject constructor(
                     openLicenses()
                     analytics.logEvent("about_open", "name" to "licenses")
                 }
+                creatorsRes?.first -> {
+                    Timber.i("Opening creators view")
+                    openCreators()
+                    analytics.logEvent("about_open", "name" to "creators")
+                }
                 privacyRes?.first -> {
                     Timber.i("Opening privacy page ")
                     openPrivacyPolicy()
@@ -65,6 +75,7 @@ class AboutPresenter @Inject constructor(
         view?.run {
             updateData(AboutScrollableHeader(), listOfNotNull(
                 versionRes?.let { (title, summary, image) -> AboutItem(title, summary, image) },
+                creatorsRes?.let { (title, summary, image) -> AboutItem(title, summary, image) },
                 feedbackRes?.let { (title, summary, image) -> AboutItem(title, summary, image) },
                 faqRes?.let { (title, summary, image) -> AboutItem(title, summary, image) },
                 discordRes?.let { (title, summary, image) -> AboutItem(title, summary, image) },
