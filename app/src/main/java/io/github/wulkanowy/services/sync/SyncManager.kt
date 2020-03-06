@@ -2,6 +2,7 @@ package io.github.wulkanowy.services.sync
 
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.BackoffPolicy.EXPONENTIAL
 import androidx.work.Constraints
 import androidx.work.Data
@@ -18,8 +19,7 @@ import com.paulinasadowska.rxworkmanagerobservers.extensions.getWorkInfoByIdObse
 import io.github.wulkanowy.data.db.SharedPrefProvider
 import io.github.wulkanowy.data.db.SharedPrefProvider.Companion.APP_VERSION_CODE_KEY
 import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
-import io.github.wulkanowy.services.sync.channels.DebugChannel
-import io.github.wulkanowy.services.sync.channels.NewEntriesChannel
+import io.github.wulkanowy.services.sync.channels.Channel
 import io.github.wulkanowy.utils.AppInfo
 import io.github.wulkanowy.utils.isHolidays
 import io.reactivex.Observable
@@ -33,9 +33,9 @@ import javax.inject.Singleton
 class SyncManager @Inject constructor(
     private val workManager: WorkManager,
     private val preferencesRepository: PreferencesRepository,
+    channels: Set<@JvmSuppressWildcards Channel>,
+    notificationManager: NotificationManagerCompat,
     sharedPrefProvider: SharedPrefProvider,
-    newEntriesChannel: NewEntriesChannel,
-    debugChannel: DebugChannel,
     appInfo: AppInfo
 ) {
 
@@ -43,8 +43,8 @@ class SyncManager @Inject constructor(
         if (now().isHolidays) stopSyncWorker()
 
         if (SDK_INT > O) {
-            newEntriesChannel.create()
-            if (appInfo.isDebug) debugChannel.create()
+            channels.forEach { it.create() }
+            notificationManager.deleteNotificationChannel("new_entries_channel")
         }
 
         if (sharedPrefProvider.getLong(APP_VERSION_CODE_KEY, -1L) != appInfo.versionCode.toLong()) {
