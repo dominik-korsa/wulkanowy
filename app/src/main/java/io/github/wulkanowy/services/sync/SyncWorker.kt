@@ -67,7 +67,7 @@ class SyncWorker @AssistedInject constructor(
                 }
             }
             .doOnSuccess {
-                if (preferencesRepository.isDebugNotificationEnable && appInfo.systemVersion >= LOLLIPOP) notify(it)
+                if (preferencesRepository.isDebugNotificationEnable) notify(it)
                 Timber.i("SyncWorker result: $it")
             }
     }
@@ -75,7 +75,7 @@ class SyncWorker @AssistedInject constructor(
     private fun notify(result: Result) {
         notificationManager.notify(Random.nextInt(Int.MAX_VALUE), NotificationCompat.Builder(applicationContext, DebugChannel.CHANNEL_ID)
             .setContentTitle("Debug notification")
-            .setSmallIcon(R.drawable.ic_more_settings)
+            .setSmallIcon(R.drawable.ic_stat_push)
             .setAutoCancel(true)
             .setColor(applicationContext.getCompatColor(R.color.colorPrimary))
             .setStyle(BigTextStyle().bigText("${SyncWorker::class.java.simpleName} result: $result"))
