@@ -1,6 +1,7 @@
 package io.github.wulkanowy.services.sync
 
 import android.content.Context
+import android.os.Build.VERSION_CODES.LOLLIPOP
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.BigTextStyle
 import androidx.core.app.NotificationCompat.PRIORITY_DEFAULT
@@ -18,6 +19,7 @@ import io.github.wulkanowy.data.repositories.student.StudentRepository
 import io.github.wulkanowy.sdk.exception.FeatureDisabledException
 import io.github.wulkanowy.services.sync.channels.DebugChannel
 import io.github.wulkanowy.services.sync.works.Work
+import io.github.wulkanowy.utils.AppInfo
 import io.github.wulkanowy.utils.getCompatColor
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -31,7 +33,8 @@ class SyncWorker @AssistedInject constructor(
     private val semesterRepository: SemesterRepository,
     private val works: Set<@JvmSuppressWildcards Work>,
     private val preferencesRepository: PreferencesRepository,
-    private val notificationManager: NotificationManagerCompat
+    private val notificationManager: NotificationManagerCompat,
+    private val appInfo: AppInfo
 ) : RxWorker(appContext, workerParameters) {
 
     override fun createWork(): Single<Result> {
@@ -64,7 +67,7 @@ class SyncWorker @AssistedInject constructor(
                 }
             }
             .doOnSuccess {
-                if (preferencesRepository.isDebugNotificationEnable) notify(it)
+                if (preferencesRepository.isDebugNotificationEnable && appInfo.systemVersion >= LOLLIPOP) notify(it)
                 Timber.i("SyncWorker result: $it")
             }
     }
