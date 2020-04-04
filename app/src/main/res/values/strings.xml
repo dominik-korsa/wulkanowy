@@ -50,6 +50,7 @@
     <string name="login_invalid_token">Invalid token</string>
     <string name="login_expired_token">Token expired</string>
     <string name="login_invalid_email">Invalid email</string>
+    <string name="login_invalid_login">Invalid login</string>
     <string name="login_invalid_symbol">Invalid symbol</string>
     <string name="login_incorrect_symbol">Student not found. Check the symbol</string>
     <string name="login_field_required">This field is required</string>
@@ -209,6 +210,7 @@
 
     <!--Note-->
     <string name="note_no_items">No info about notes</string>
+    <string name="note_points">Points</string>
     <plurals name="note_number_item">
         <item quantity="one">%d note</item>
         <item quantity="other">%d notes</item>
@@ -225,6 +227,9 @@
 
     <!--Homework-->
     <string name="homework_no_items">No info about homework</string>
+    <string name="homework_mark_as_done">Mark as done</string>
+    <string name="homework_mark_as_undone">Mark as undone</string>
+    <string name="homework_attachments">Attachments</string>
 
 
     <!--Lucky number-->
@@ -329,6 +334,7 @@
     <string name="widget_timetable_theme_title">Choose theme</string>
     <string name="widget_timetable_theme_light">Light</string>
     <string name="widget_timetable_theme_dark">Dark</string>
+    <string name="widget_timetable_theme_system">System Theme</string>
 
 
     <!--Preferences-->
@@ -374,6 +380,7 @@
     <string name="channel_lucky_number">Lucky number</string>
     <string name="channel_new_message">New messages</string>
     <string name="channel_new_notes">New notes</string>
+    <string name="channel_push">Push notifications</string>
     <string name="channel_debug">Debug</string>
 
 
