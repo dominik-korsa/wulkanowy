@@ -44,9 +44,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun initView() {
-        (findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            presenter.onSyncNowClicked()
-            true
+        findPreference<Preference>(getString(R.string.pref_key_services_force_sync))?.run {
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                presenter.onSyncNowClicked()
+                true
+            }
         }
     }
 
@@ -73,14 +75,14 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun setServicesSuspended(serviceEnablesKey: String, isHolidays: Boolean) {
-        findPreference<Preference>(serviceEnablesKey)?.apply {
+        findPreference<Preference>(serviceEnablesKey)?.run {
             summary = if (isHolidays) getString(R.string.pref_services_suspended) else ""
             isEnabled = !isHolidays
         }
     }
 
     override fun setSyncInProgress(inProgress: Boolean) {
-        (findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?)?.apply {
+        (findPreference(getString(R.string.pref_key_services_force_sync)) as Preference?)?.run {
             isEnabled = !inProgress
             summary = if (inProgress) getString(R.string.pref_services_sync_in_progress) else ""
         }
