@@ -184,17 +184,6 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
         outState.putLong(SAVED_DATE_KEY, presenter.currentDate.toEpochDay())
     }
 
-    override fun updateTimeLeft() {
-        with(timetableAdapter) {
-            items.forEachIndexed { i, item ->
-                if (getTimeNeedsUpdate(item, i)) {
-                    items[i] = item
-                    notifyItemChanged(i)
-                }
-            }
-        }
-    }
-
     override fun onDestroyView() {
         presenter.onDetachView()
         super.onDestroyView()

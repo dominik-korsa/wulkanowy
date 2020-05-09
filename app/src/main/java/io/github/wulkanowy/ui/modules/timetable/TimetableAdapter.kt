@@ -14,7 +14,10 @@ import io.github.wulkanowy.databinding.ItemTimetableSmallBinding
 import io.github.wulkanowy.utils.getThemeAttrColor
 import io.github.wulkanowy.utils.toFormattedString
 import org.threeten.bp.LocalDateTime
+import timber.log.Timber
+import java.util.Timer
 import javax.inject.Inject
+import kotlin.concurrent.timer
 
 class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -24,10 +27,23 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
     }
 
     var items = mutableListOf<Timetable>()
+        set(value) {
+            field = value
+            resetTimers()
+        }
 
     var onClickListener: (Timetable) -> Unit = {}
 
     var showWholeClassPlan: String = "no"
+
+    private val timers = mutableMapOf<Int, Timer>()
+
+    private fun resetTimers() {
+        with(timers) {
+            forEach { (_, timer) -> timer.cancel() }
+            clear()
+        }
+    }
 
     override fun getItemCount() = items.size
 
@@ -83,7 +99,13 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
             bindSubjectStyle(timetableItemSubject, lesson)
             bindNormalDescription(binding, lesson)
             bindNormalColors(binding, lesson)
-            updateTimeLeft(this, lesson, position)
+
+            timers[position] = timer("lesson", false, 0, 1000) {
+                Timber.d("updateTimeLeft: $position")
+                root.post {
+                    updateTimeLeft(binding, lesson, position)
+                }
+            }
 
             root.setOnClickListener { onClickListener(lesson) }
         }
@@ -96,16 +118,8 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
         }
     }
 
-    private var lastTimeLeftShownCode: String? = null
-
-    fun getTimeNeedsUpdate(lesson: Timetable, position: Int): Boolean {
-        return TimetableItemDisplayState(lesson, getPreviousLesson(position)).code != lastTimeLeftShownCode
-    }
-
     private fun updateTimeLeft(binding: ItemTimetableBinding, lesson: Timetable, position: Int) {
         val displayState = TimetableItemDisplayState(lesson, getPreviousLesson(position))
-
-        lastTimeLeftShownCode = displayState.code
 
         with(binding) {
             when {
