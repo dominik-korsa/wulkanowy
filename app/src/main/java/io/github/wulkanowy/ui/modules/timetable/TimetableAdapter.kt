@@ -12,7 +12,11 @@ import io.github.wulkanowy.data.db.entities.Timetable
 import io.github.wulkanowy.databinding.ItemTimetableBinding
 import io.github.wulkanowy.databinding.ItemTimetableSmallBinding
 import io.github.wulkanowy.utils.getThemeAttrColor
+import io.github.wulkanowy.utils.isJustFinished
+import io.github.wulkanowy.utils.isShowTimeUntil
+import io.github.wulkanowy.utils.left
 import io.github.wulkanowy.utils.toFormattedString
+import io.github.wulkanowy.utils.until
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import java.util.Timer
@@ -119,42 +123,46 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
     }
 
     private fun updateTimeLeft(binding: ItemTimetableBinding, lesson: Timetable, position: Int) {
-        val displayState = TimetableItemDisplayState(lesson, getPreviousLesson(position))
-
         with(binding) {
             when {
-                displayState.justFinished -> {
+                // before lesson
+                lesson.isShowTimeUntil(getPreviousLesson(position)) -> {
+                    timetableItemTimeLeft.visibility = GONE
+                    with(timetableItemTimeUntil) {
+                        visibility = VISIBLE
+                        text = context.getString(R.string.timetable_time_until,
+                            if (lesson.until.seconds <= 60) {
+                                context.getString(R.string.timetable_seconds, lesson.until.seconds.toString(10))
+                            } else {
+                                context.getString(R.string.timetable_minutes, lesson.until.toMinutes().toString(10))
+                            }
+                        )
+                    }
+                }
+                // after lesson start
+                lesson.left != null -> {
+                    timetableItemTimeUntil.visibility = GONE
+                    with(timetableItemTimeLeft) {
+                        visibility = VISIBLE
+                        text = context.getString(
+                            R.string.timetable_time_left,
+                            if (lesson.left!!.seconds <= 60) {
+                                context.getString(R.string.timetable_seconds, lesson.left?.seconds?.toString(10))
+                            } else {
+                                context.getString(R.string.timetable_minutes, lesson.left?.toMinutes()?.toString(10))
+                            }
+                        )
+                    }
+                }
+                // right after lesson finish
+                lesson.isJustFinished -> {
                     timetableItemTimeUntil.visibility = GONE
                     timetableItemTimeLeft.visibility = VISIBLE
                     timetableItemTimeLeft.text = root.context.getString(R.string.timetable_finished)
                 }
-                displayState.showTimeUntil -> {
-                    timetableItemTimeUntil.visibility = VISIBLE
-                    timetableItemTimeLeft.visibility = GONE
-                    timetableItemTimeUntil.text = root.context.getString(
-                        R.string.timetable_time_until,
-                        if (displayState.timeUntil.seconds <= 60) {
-                            root.context.getString(R.string.timetable_seconds, displayState.timeUntil.seconds.toString(10))
-                        } else {
-                            root.context.getString(R.string.timetable_minutes, displayState.timeUntil.toMinutes().toString(10))
-                        }
-                    )
-                }
-                displayState.timeLeft == null -> {
+                lesson.left == null -> {
                     timetableItemTimeUntil.visibility = GONE
                     timetableItemTimeLeft.visibility = GONE
-                }
-                else -> {
-                    timetableItemTimeUntil.visibility = GONE
-                    timetableItemTimeLeft.visibility = VISIBLE
-                    timetableItemTimeLeft.text = root.context.getString(
-                        R.string.timetable_time_left,
-                        if (displayState.timeLeft.seconds <= 60) {
-                            root.context.getString(R.string.timetable_seconds, displayState.timeLeft.seconds.toString(10))
-                        } else {
-                            root.context.getString(R.string.timetable_minutes, displayState.timeLeft.toMinutes().toString(10))
-                        }
-                    )
                 }
             }
         }
