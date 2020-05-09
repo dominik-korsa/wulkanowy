@@ -40,6 +40,8 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
 
     var showWholeClassPlan: String = "no"
 
+    var showTimers: Boolean = false
+
     private val timers = mutableMapOf<Int, Timer>()
 
     private fun resetTimers() {
@@ -110,9 +112,13 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
             bindNormalDescription(binding, lesson)
             bindNormalColors(binding, lesson)
 
-            if (lesson.isStudentPlan) timers[position] = timer(period = 1000) {
+            if (lesson.isStudentPlan && showTimers) timers[position] = timer(period = 1000) {
                 root.post { updateTimeLeft(binding, lesson, position) }
-            } else updateTimeLeft(binding, lesson, position) // reset item on set changed
+            } else {
+                // reset item on set changed
+                timetableItemTimeUntil.visibility = GONE
+                timetableItemTimeLeft.visibility = GONE
+            }
 
             root.setOnClickListener { onClickListener(lesson) }
         }

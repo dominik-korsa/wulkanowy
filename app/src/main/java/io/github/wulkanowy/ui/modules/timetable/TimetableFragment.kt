@@ -89,9 +89,10 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
         else false
     }
 
-    override fun updateData(data: List<Timetable>, showWholeClassPlanType: String) {
+    override fun updateData(data: List<Timetable>, showWholeClassPlanType: String, showTimetableTimers: Boolean) {
         with(timetableAdapter) {
             items = data.toMutableList()
+            showTimers = showTimetableTimers
             showWholeClassPlan = showWholeClassPlanType
             notifyDataSetChanged()
         }
