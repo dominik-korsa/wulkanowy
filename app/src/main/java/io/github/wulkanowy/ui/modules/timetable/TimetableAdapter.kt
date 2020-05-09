@@ -110,16 +110,16 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
             bindNormalDescription(binding, lesson)
             bindNormalColors(binding, lesson)
 
-            timers[position] = timer(period = 1000) {
+            if (lesson.isStudentPlan) timers[position] = timer(period = 1000) {
                 root.post { updateTimeLeft(binding, lesson, position) }
-            }
+            } else updateTimeLeft(binding, lesson, position) // reset item on set changed
 
             root.setOnClickListener { onClickListener(lesson) }
         }
     }
 
     private fun getPreviousLesson(position: Int): LocalDateTime? {
-        return items.filter { it.isStudentPlan }.getOrNull(position - 1 - items.filter { !it.isStudentPlan }.filterIndexed { it, _ -> it < position }.size)?.let {
+        return items.filter { it.isStudentPlan }.getOrNull(position - 1 - items.filterIndexed { i, item -> i < position && !item.isStudentPlan }.size)?.let {
             if (!it.canceled && it.isStudentPlan) it.end
             else null
         }
