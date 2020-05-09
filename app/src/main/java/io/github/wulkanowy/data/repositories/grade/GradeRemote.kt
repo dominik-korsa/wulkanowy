@@ -14,7 +14,7 @@ class GradeRemote @Inject constructor(private val sdk: Sdk) {
 
     fun getGrades(student: Student, semester: Semester): Single<List<Grade>> {
         return sdk.init(student).switchDiary(semester.diaryId, semester.schoolYear)
-            .getGrades(semester.semesterId)
+            .getGradesDetails(semester.semesterId)
             .map { grades ->
                 grades.map {
                     Grade(

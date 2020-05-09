@@ -43,6 +43,7 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
     private val timers = mutableMapOf<Int, Timer>()
 
     private fun resetTimers() {
+        Timber.d("Timetable timers reset")
         with(timers) {
             forEach { (_, timer) -> timer.cancel() }
             clear()
@@ -118,7 +119,7 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
     }
 
     private fun getPreviousLesson(position: Int): LocalDateTime? {
-        return items.getOrNull(position - 1)?.let {
+        return items.filter { it.isStudentPlan }.getOrNull(position - 1 - items.filter { !it.isStudentPlan }.filterIndexed { it, _ -> it < position }.size)?.let {
             if (!it.canceled && it.isStudentPlan) it.end
             else null
         }
