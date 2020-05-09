@@ -66,6 +66,11 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
         }
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        resetTimers()
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val lesson = items[position]
 
@@ -104,11 +109,8 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
             bindNormalDescription(binding, lesson)
             bindNormalColors(binding, lesson)
 
-            timers[position] = timer("lesson", false, 0, 1000) {
-                Timber.d("updateTimeLeft: $position")
-                root.post {
-                    updateTimeLeft(binding, lesson, position)
-                }
+            timers[position] = timer(period = 1000) {
+                root.post { updateTimeLeft(binding, lesson, position) }
             }
 
             root.setOnClickListener { onClickListener(lesson) }
@@ -127,6 +129,7 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
             when {
                 // before lesson
                 lesson.isShowTimeUntil(getPreviousLesson(position)) -> {
+                    Timber.d("Show time until lesson: $position")
                     timetableItemTimeLeft.visibility = GONE
                     with(timetableItemTimeUntil) {
                         visibility = VISIBLE
@@ -141,12 +144,13 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
                 }
                 // after lesson start
                 lesson.left != null -> {
+                    Timber.d("Show time left lesson: $position")
                     timetableItemTimeUntil.visibility = GONE
                     with(timetableItemTimeLeft) {
                         visibility = VISIBLE
                         text = context.getString(
                             R.string.timetable_time_left,
-                            if (lesson.left!!.seconds <= 60) {
+                            if (lesson.left!!.seconds < 60) {
                                 context.getString(R.string.timetable_seconds, lesson.left?.seconds?.toString(10))
                             } else {
                                 context.getString(R.string.timetable_minutes, lesson.left?.toMinutes()?.toString(10))
@@ -156,11 +160,12 @@ class TimetableAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerView
                 }
                 // right after lesson finish
                 lesson.isJustFinished -> {
+                    Timber.d("Show just finished lesson: $position")
                     timetableItemTimeUntil.visibility = GONE
                     timetableItemTimeLeft.visibility = VISIBLE
                     timetableItemTimeLeft.text = root.context.getString(R.string.timetable_finished)
                 }
-                lesson.left == null -> {
+                else -> {
                     timetableItemTimeUntil.visibility = GONE
                     timetableItemTimeLeft.visibility = GONE
                 }
