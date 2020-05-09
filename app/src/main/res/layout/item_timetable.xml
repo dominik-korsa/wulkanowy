@@ -29,12 +29,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="?android:textColorPrimary"
         android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/timetableItemTimeBarrier"
         app:layout_constraintStart_toEndOf="@+id/timetableItemTimeStart"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/lorem" />
@@ -105,6 +105,13 @@
         app:layout_constraintTop_toTopOf="@+id/timetableItemTimeFinish"
         tools:text="Lekcja odwołana: uczniowie zwolnieni do domu"
         tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/timetableItemTimeBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="timetableItemTimeUntil,timetableItemTimeLeft" />
 
     <TextView
         android:id="@+id/timetableItemTimeUntil"
