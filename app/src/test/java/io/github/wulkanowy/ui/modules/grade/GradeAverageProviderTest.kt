@@ -6,7 +6,7 @@ import io.github.wulkanowy.data.db.entities.Student
 import io.github.wulkanowy.data.repositories.grade.GradeRepository
 import io.github.wulkanowy.data.repositories.gradessummary.GradeSummaryRepository
 import io.github.wulkanowy.data.repositories.preferences.PreferencesRepository
-import io.github.wulkanowy.data.repositories.createSemesterEntity
+import io.github.wulkanowy.createSemesterEntity
 import io.github.wulkanowy.sdk.Sdk
 import io.reactivex.Single
 import org.junit.Assert.assertEquals
