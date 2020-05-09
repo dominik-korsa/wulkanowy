@@ -9,22 +9,18 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
-import eu.davidea.flexibleadapter.FlexibleAdapter
-import eu.davidea.flexibleadapter.common.FlexibleItemDecoration
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import io.github.wulkanowy.R
 import io.github.wulkanowy.data.db.entities.Timetable
 import io.github.wulkanowy.ui.base.BaseFragment
+import io.github.wulkanowy.ui.widgets.DividerItemDecoration
 import io.github.wulkanowy.ui.modules.main.MainActivity
 import io.github.wulkanowy.ui.modules.main.MainView
 import io.github.wulkanowy.ui.modules.timetable.completed.CompletedLessonsFragment
 import io.github.wulkanowy.utils.SchooldaysRangeLimiter
 import io.github.wulkanowy.utils.dpToPx
-import io.github.wulkanowy.utils.setOnItemClickListener
 import kotlinx.android.synthetic.main.fragment_timetable.*
-import timber.log.Timber
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
@@ -35,7 +31,7 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
     lateinit var presenter: TimetablePresenter
 
     @Inject
-    lateinit var timetableAdapter: FlexibleAdapter<AbstractFlexibleItem<*>>
+    lateinit var timetableAdapter: TimetableAdapter
 
     companion object {
         private const val SAVED_DATE_KEY = "CURRENT_DATE"
@@ -45,7 +41,7 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
 
     override val titleStringId get() = R.string.timetable_title
 
-    override val isViewEmpty get() = timetableAdapter.isEmpty
+    override val isViewEmpty get() = timetableAdapter.items.isEmpty()
 
     override val currentStackSize get() = (activity as? MainActivity)?.currentStackSize
 
@@ -65,15 +61,12 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
     }
 
     override fun initView() {
-        timetableAdapter.setOnItemClickListener(presenter::onTimetableItemSelected)
+        timetableAdapter.onClickListener = presenter::onTimetableItemSelected
 
         with(timetableRecycler) {
-            layoutManager = SmoothScrollLinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
             adapter = timetableAdapter
-            addItemDecoration(FlexibleItemDecoration(context)
-                .withDefaultDivider()
-                .withDrawDividerOnLastItem(false)
-            )
+            addItemDecoration(DividerItemDecoration(context))
         }
 
         timetableSwipe.setOnRefreshListener(presenter::onSwipeRefresh)
@@ -96,12 +89,19 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
         else false
     }
 
-    override fun updateData(data: List<TimetableItem>) {
-        timetableAdapter.updateDataSet(data, true)
+    override fun updateData(data: List<Timetable>, showWholeClassPlanType: String) {
+        with(timetableAdapter) {
+            items = data.toMutableList()
+            showWholeClassPlan = showWholeClassPlanType
+            notifyDataSetChanged()
+        }
     }
 
     override fun clearData() {
-        timetableAdapter.clear()
+        with(timetableAdapter) {
+            items = mutableListOf()
+            notifyDataSetChanged()
+        }
     }
 
     override fun updateNavigationDay(date: String) {
@@ -185,10 +185,12 @@ class TimetableFragment : BaseFragment(), TimetableView, MainView.MainChildView,
     }
 
     override fun updateTimeLeft() {
-        for (i in 0 until timetableAdapter.itemCount) {
-            val item = timetableAdapter.getItem(i) as TimetableItem?
-            if (item != null && item.getTimeNeedsUpdate()) {
-                timetableAdapter.updateItem(item)
+        with(timetableAdapter) {
+            items.forEachIndexed { i, item ->
+                if (getTimeNeedsUpdate(item, i)) {
+                    items[i] = item
+                    notifyItemChanged(i)
+                }
             }
         }
     }
