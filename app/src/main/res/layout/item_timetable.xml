@@ -146,8 +146,11 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
+        android:includeFontPadding="false"
+        android:paddingLeft="7dp"
+        android:paddingRight="7dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
         android:textColor="?colorOnPrimary"
         android:textSize="13sp"
         android:visibility="gone"
@@ -155,5 +158,4 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="jeszcze 15 min"
         tools:visibility="visible" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
