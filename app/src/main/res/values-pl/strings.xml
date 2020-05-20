@@ -303,11 +303,13 @@
     <string name="all_subject">Przedmiot</string>
     <string name="all_prev">Poprzedni</string>
     <string name="all_next">Następny</string>
+    <string name="all_search">Szukaj</string>
     <!--Timetable Widget-->
     <string name="widget_timetable_no_items">Brak lekcji</string>
     <string name="widget_timetable_theme_title">Wybierz motyw</string>
     <string name="widget_timetable_theme_light">Jasny</string>
     <string name="widget_timetable_theme_dark">Ciemny</string>
+    <string name="widget_timetable_theme_system">Motyw systemu</string>
     <!--Preferences-->
     <string name="pref_view_header">Wygląd</string>
     <string name="pref_view_list">Domyślny widok</string>
@@ -316,6 +318,7 @@
     <string name="pref_view_present">Pokazuj obecność we frekwencji</string>
     <string name="pref_view_app_theme">Motyw aplikacji</string>
     <string name="pref_view_expand_grade">Rozwiń oceny</string>
+    <string name="pref_view_grade_statistics_list">Pokazuj listę wykresów w ocenach klasy</string>
     <string name="pref_view_timetable_show_timers">Oznaczaj bieżącą lekcję na planie</string>
     <string name="pref_view_timetable_show_whole_class">Pokazuj lekcje całej klasy</string>
     <string name="pref_view_grade_color_scheme">Schemat kolorów ocen</string>

@@ -334,6 +334,8 @@
     <string name="all_subject">Subject</string>
     <string name="all_prev">Prev</string>
     <string name="all_next">Next</string>
+    <string name="all_search">Search</string>
+    <string name="all_search_hint">Search...</string>
 
 
     <!--Timetable Widget-->
@@ -341,6 +343,7 @@
     <string name="widget_timetable_theme_title">Choose theme</string>
     <string name="widget_timetable_theme_light">Light</string>
     <string name="widget_timetable_theme_dark">Dark</string>
+    <string name="widget_timetable_theme_system">System Theme</string>
 
 
     <!--Preferences-->
@@ -352,6 +355,7 @@
     <string name="pref_view_app_theme">Application theme</string>
     <string name="pref_view_expand_grade">Expand grades</string>
     <string name="pref_view_timetable_show_timers">Mark current lesson in timetable</string>
+    <string name="pref_view_grade_statistics_list">Show chart list in class grades</string>
     <string name="pref_view_timetable_show_whole_class">Show whole class lessons</string>
     <string name="pref_view_grade_color_scheme">Grades color scheme</string>
     <string name="pref_view_app_language">App language</string>
