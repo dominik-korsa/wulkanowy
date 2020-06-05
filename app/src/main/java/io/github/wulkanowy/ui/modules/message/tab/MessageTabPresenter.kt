@@ -1,7 +1,7 @@
 package io.github.wulkanowy.ui.modules.message.tab
 
-import android.annotation.SuppressLint
 import io.github.wulkanowy.data.db.entities.Message
+import io.github.wulkanowy.data.pojos.MessageSearchMatch
 import io.github.wulkanowy.data.repositories.message.MessageFolder
 import io.github.wulkanowy.data.repositories.message.MessageRepository
 import io.github.wulkanowy.data.repositories.semester.SemesterRepository
@@ -10,7 +10,6 @@ import io.github.wulkanowy.ui.base.BasePresenter
 import io.github.wulkanowy.ui.base.ErrorHandler
 import io.github.wulkanowy.utils.FirebaseAnalyticsHelper
 import io.github.wulkanowy.utils.SchedulersProvider
-import io.github.wulkanowy.utils.toFormattedString
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -121,20 +120,23 @@ class MessageTabPresenter @Inject constructor(
         }
     }
 
-    @SuppressLint("DefaultLocale")
     fun onSearchQueryTextChange(query: String) {
         lastSearchQuery = query
+        val trimmedQuery = query.trim()
 
-        val lowerCaseQuery = query.toLowerCase()
-        val filteredList = mutableListOf<Message>()
-        messages.forEach {
-            if (lowerCaseQuery in it.subject.toLowerCase() ||
-                lowerCaseQuery in it.sender.toLowerCase() ||
-                lowerCaseQuery in it.recipient.toLowerCase() ||
-                lowerCaseQuery in it.date.toFormattedString()
-            ) {
-                filteredList.add(it)
-            }
+        val filteredList: List<MessageSearchMatch>
+
+        if (trimmedQuery.isEmpty()) {
+            filteredList = messages
+                .sortedByDescending { it.date }
+                .map { MessageSearchMatch(it, null) }
+        } else {
+            filteredList = messages
+                .map { MessageSearchMatch(it, trimmedQuery) }
+                .sortedByDescending { it.totalRatioWeighted }
+                .filter { message ->
+                    message.totalRatioWeighted ?: 0 > 5000
+                }
         }
 
         Timber.d("Applying filter. Full list: ${messages.size}, filtered: ${filteredList.size}")
@@ -142,13 +144,12 @@ class MessageTabPresenter @Inject constructor(
         updateData(filteredList)
     }
 
-    private fun updateData(data: List<Message>) {
+    private fun updateData(data: List<MessageSearchMatch>) {
         view?.run {
             showEmpty(data.isEmpty())
             showContent(data.isNotEmpty())
             showErrorView(false)
             updateData(data)
-            resetListPosition()
         }
     }
 }

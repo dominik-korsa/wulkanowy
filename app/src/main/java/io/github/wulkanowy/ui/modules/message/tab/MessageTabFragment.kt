@@ -11,6 +11,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.github.wulkanowy.R
 import io.github.wulkanowy.data.db.entities.Message
+import io.github.wulkanowy.data.pojos.MessageSearchMatch
 import io.github.wulkanowy.data.repositories.message.MessageFolder
 import io.github.wulkanowy.databinding.FragmentMessageTabBinding
 import io.github.wulkanowy.ui.base.BaseFragment
@@ -89,7 +90,7 @@ class MessageTabFragment : BaseFragment<FragmentMessageTabBinding>(R.layout.frag
         })
     }
 
-    override fun updateData(data: List<Message>) {
+    override fun updateData(data: List<MessageSearchMatch>) {
         tabAdapter.replaceAll(data)
     }
 
@@ -103,10 +104,6 @@ class MessageTabFragment : BaseFragment<FragmentMessageTabBinding>(R.layout.frag
 
     override fun enableSwipe(enable: Boolean) {
         binding.messageTabSwipe.isEnabled = enable
-    }
-
-    override fun resetListPosition() {
-        binding.messageTabRecycler.scrollToPosition(0)
     }
 
     override fun showContent(show: Boolean) {

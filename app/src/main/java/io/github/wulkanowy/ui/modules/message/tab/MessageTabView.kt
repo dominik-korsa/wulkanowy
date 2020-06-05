@@ -1,6 +1,7 @@
 package io.github.wulkanowy.ui.modules.message.tab
 
 import io.github.wulkanowy.data.db.entities.Message
+import io.github.wulkanowy.data.pojos.MessageSearchMatch
 import io.github.wulkanowy.ui.base.BaseView
 
 interface MessageTabView : BaseView {
@@ -9,9 +10,7 @@ interface MessageTabView : BaseView {
 
     fun initView()
 
-    fun resetListPosition()
-
-    fun updateData(data: List<Message>)
+    fun updateData(data: List<MessageSearchMatch>)
 
     fun updateItem(item: Message, position: Int)
 

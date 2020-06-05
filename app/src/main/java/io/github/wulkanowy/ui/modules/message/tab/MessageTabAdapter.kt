@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
-import androidx.recyclerview.widget.SortedList
-import androidx.recyclerview.widget.SortedListAdapterCallback
 import io.github.wulkanowy.R
 import io.github.wulkanowy.data.db.entities.Message
+import io.github.wulkanowy.data.pojos.MessageSearchMatch
 import io.github.wulkanowy.data.repositories.message.MessageFolder
 import io.github.wulkanowy.databinding.ItemMessageBinding
 import io.github.wulkanowy.utils.toFormattedString
@@ -20,39 +19,52 @@ class MessageTabAdapter @Inject constructor() :
 
     var onClickListener: (Message, position: Int) -> Unit = { _, _ -> }
 
-    private val items = SortedList(Message::class.java, object :
-        SortedListAdapterCallback<Message>(this) {
+    private val items = mutableListOf<MessageSearchMatch>()
 
-        override fun compare(item1: Message, item2: Message): Int {
-            return item2.date.compareTo(item1.date)
-        }
-
-        override fun areContentsTheSame(oldItem: Message?, newItem: Message?): Boolean {
-            return oldItem == newItem
-        }
-
-        override fun areItemsTheSame(item1: Message, item2: Message): Boolean {
-            return item1 == item2
-        }
-    })
-
-    fun replaceAll(models: List<Message>) {
-        items.beginBatchedUpdates()
-        for (i in items.size() - 1 downTo 0) {
-            val model = items.get(i)
-            if (model !in models) {
-                items.remove(model)
+    fun replaceAll(models: List<MessageSearchMatch>) {
+        for (i in items.size - 1 downTo 0) {
+            val item = items.get(i)
+            if (models.find { it.message.id == item.message.id } == null) {
+                items.removeAt(i)
+                notifyItemRemoved(i)
             }
         }
-        items.addAll(models)
-        items.endBatchedUpdates()
+
+        models.forEachIndexed { index, model ->
+            if (items.find { it.message.id == model.message.id } == null) {
+                items.add(index, model)
+                notifyItemInserted(index)
+            }
+        }
+
+        models.forEachIndexed { index, model ->
+            val indexOfItem = items.indexOfFirst { it.message.id == model.message.id }
+            val item = items.get(indexOfItem)
+            if (indexOfItem != index) {
+                for (i in indexOfItem - 1 downTo index) {
+                    items.set(i + 1, items.get(i))
+                }
+
+                items.set(index, model)
+
+                notifyItemMoved(indexOfItem, index)
+            }
+
+            if (item.message.hashCode() != model.message.hashCode()) {
+                notifyItemChanged(index)
+            }
+        }
     }
 
     fun updateItem(position: Int, item: Message) {
-        items.updateItemAt(position, item)
+        val currentItem = items.get(position)
+        items.set(position, MessageSearchMatch(item, currentItem.query))
+        if (item.hashCode() != currentItem.message.hashCode()) {
+            notifyItemChanged(position)
+        }
     }
 
-    override fun getItemCount() = items.size()
+    override fun getItemCount() = items.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ItemViewHolder(
         ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -62,24 +74,24 @@ class MessageTabAdapter @Inject constructor() :
         val item = items[position]
 
         with(holder.binding) {
-            val style = if (item.unread) Typeface.BOLD else Typeface.NORMAL
+            val style = if (item.message.unread) Typeface.BOLD else Typeface.NORMAL
 
             messageItemAuthor.run {
-                text = if (item.folderId == MessageFolder.SENT.id) item.recipient else item.sender
+                text = if (item.message.folderId == MessageFolder.SENT.id) item.message.recipient else item.message.sender
                 setTypeface(null, style)
             }
             messageItemSubject.run {
-                text = if (item.subject.isNotBlank()) item.subject else context.getString(R.string.message_no_subject)
+                text = if (item.message.subject.isNotBlank()) item.message.subject else context.getString(R.string.message_no_subject)
                 setTypeface(null, style)
             }
             messageItemDate.run {
-                text = item.date.toFormattedString()
+                text = item.message.date.toFormattedString()
                 setTypeface(null, style)
             }
-            messageItemAttachmentIcon.visibility = if (item.hasAttachments) View.VISIBLE else View.GONE
+            messageItemAttachmentIcon.visibility = if (item.message.hasAttachments) View.VISIBLE else View.GONE
 
             root.setOnClickListener {
-                holder.adapterPosition.let { if (it != NO_POSITION) onClickListener(item, it) }
+                holder.adapterPosition.let { if (it != NO_POSITION) onClickListener(item.message, it) }
             }
         }
     }
